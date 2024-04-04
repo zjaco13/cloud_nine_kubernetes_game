@@ -1,4 +1,4 @@
-
+""" 
 from game_object import GameObject
 from game_util_objects import Player
 
@@ -18,3 +18,4 @@ class MyGameObject(GameObject):
         self.art.write_string(0, 0, 3, 2, 'hello!', color)
         # run parent class update
         GameObject.update(self)
+ """
