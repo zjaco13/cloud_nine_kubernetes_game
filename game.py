@@ -24,22 +24,30 @@ class Player(pygame.sprite.Sprite):
         self.image.fill(RED)
         self.rect = self.image.get_rect()
         self.rect.center = (screen_width // 2, screen_height // 2)
-    def update(self):
+        self.dx = 0
+        self.dy = 0
+    def update(self, *args, **kwargs):
         key = pygame.key.get_pressed()
+        self.dx = 0
+        self.dy = 0 
         dist = 2 # distance moved in 1 frame, try changing it to 5
         if key[pygame.K_s]: # down key
-            self.rect.y += dist # move down
-            self.rect.bottom = min(self.rect.bottom, screen_height)
+            self.dy += dist
         elif key[pygame.K_w]: # up key
-            self.rect.y -= dist # move up
-            self.rect.top = max(self.rect.top, 0)
+            self.dy -= dist
         if key[pygame.K_d]: # right key
-            self.rect.x += dist # move right
-            self.rect.right = min(self.rect.right, screen_width)
+            self.dx+= dist
         elif key[pygame.K_a]: # left key
-            self.rect.x -= dist # move left
-            self.rect.left = max(self.rect.left, 0)
+            self.dx-= dist
+        self.rect.x += self.dx
+        self.rect.y += self.dy
+        collisions = pygame.sprite.spritecollide(self, npcs, False)
+        #for npc in collisions:
 
+        self.rect.left = max(self.rect.left, 0)
+        self.rect.top = max(self.rect.top, 0)
+        self.rect.bottom = min(self.rect.bottom, screen_height)
+        self.rect.right = min(self.rect.right, screen_width)
     def draw(self, surface):
         """ Draw on surface """
         # blit yourself at your current position
@@ -47,12 +55,31 @@ class Player(pygame.sprite.Sprite):
 
 # Define NPC class
 class NPC(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, text):
         super().__init__()
         self.image = pygame.Surface((50, 50))
         self.image.fill(BLACK)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
+        self.is_colliding = False
+        self.col = -1
+        self.text = text
+    def update(self, *args, **kwargs) -> None:
+
+        collisions = pygame.sprite.spritecollide(self, players, False)
+        if not collisions:
+            self.is_colliding = False
+        for player in collisions:
+            if self.is_colliding:
+                player.rect.center = (player.rect.centerx - player.dx, player.rect.centery -player.dy)
+            if not self.is_colliding:
+                self.col += 1
+                print(self.col)
+            self.is_colliding = True
+            if self.col < len(self.text):
+                word_wrap(screen, self.text[self.col], font, BLACK)
+
+
 
 def word_wrap(surf, text, font, color=(0, 0, 0)):
     font.origin = True
@@ -83,15 +110,13 @@ player = Player()
 all_sprites.add(player)
 players.add(player)
 
-npc = NPC(500, 500)  # Adjust position as needed
+npc = NPC(500, 500, text = ["Collision 1, test long text, test long text, test long text, test long text", "C2", "C3", "c4"]
+)  # Adjust position as needed
 all_sprites.add(npc)
 npcs.add(npc)
 font = pygame.freetype.SysFont('firacode', 20)
 # Main loop
 running = True
-is_colliding = False 
-text = ["Collision 1, test long text, test long text, test long text, test long text", "C2", "C3", "c4"]
-col = -1
 while running:
     # Handle events
     for event in pygame.event.get():
@@ -99,19 +124,6 @@ while running:
             running = False
 
     screen.fill(WHITE)
-    #player.handle_keys()
-    # Check for collisions
-    hits = pygame.sprite.spritecollide(player, npcs, False)
-    if hits: 
-        if not is_colliding:
-            col += 1
-        is_colliding = True
-        if col < len(text):
-            word_wrap(screen, text[col], font, BLACK)
-    else:
-        is_colliding = False
-        # Here you can add code to display the blob of text
-
     # Update
     all_sprites.update()
 
