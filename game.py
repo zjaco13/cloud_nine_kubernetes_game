@@ -15,6 +15,7 @@ pygame.display.set_caption("Kubernetes Game")
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
+BLUE = (0,0, 255)
 
 # Define player class
 class Player(pygame.sprite.Sprite):
@@ -81,7 +82,7 @@ class NPC(pygame.sprite.Sprite):
         if self.is_colliding:
             if pygame.key.get_pressed()[pygame.K_RETURN]:
                 curr_keypress = pygame.time.get_ticks()
-                if curr_keypress - self.last_keypress > 1000:
+                if curr_keypress - self.last_keypress > 750:
                     self.col += 1
                     self.last_keypress = curr_keypress
             if self.col < len(self.text):
@@ -92,7 +93,46 @@ class NPC(pygame.sprite.Sprite):
                 player.is_colliding = False
                 self.spoken = True
 
-
+class Helm_NPC(pygame.sprite.Sprite):
+    def __init__(self, x, y, text):
+        super().__init__()
+        self.image = pygame.Surface((50, 50))
+        self.image.fill(BLUE)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.is_colliding = False
+        self.col = 0 
+        self.text = text
+        self.spoken_y = False
+        self.spoken_n = False
+    def update(self, *args, **kwargs) -> None:
+        collisions = pygame.sprite.spritecollide(self, players, False)
+        player = None
+        if not collisions and self.spoken_n:
+            self.spoken_n = False 
+            self.col = 0
+            
+        for p in collisions:
+            if self.spoken_y or self.spoken_n:
+                p.rect.x -= p.dx
+                p.rect.y -= p.dy
+            else:
+                p.frozen = True
+                self.is_colliding = True
+                player = p
+        if self.is_colliding:
+            if pygame.key.get_pressed()[pygame.K_y]:
+                self.spoken_y = True
+                self.col += 1
+            if pygame.key.get_pressed()[pygame.K_n]:
+                self.col += 1
+                self.spoken_n = True
+            if self.col < len(self.text):
+                word_wrap(screen, self.text[self.col], font, BLACK)
+            else:
+                player.frozen = False
+                self.is_colliding = False
+                player.is_colliding = False
 
 def word_wrap(surf, text, font, color=(0, 0, 0)):
     font.origin = True
@@ -122,11 +162,16 @@ npcs = pygame.sprite.Group()
 player = Player()
 all_sprites.add(player)
 players.add(player)
+kube_text = ["k1", "k2", "k3"]
+docker_text = ["d1", "d2", "d3"]
+start_text = ["Set Sail? (Y/N)"]
 
-npc = NPC(500, 500, text = ["Collision 1, test long text, test long text, test long text, test long text", "C2", "C3", "c4"]
-)  # Adjust position as needed
-all_sprites.add(npc)
-npcs.add(npc)
+kube_npc = NPC(300, 800, kube_text)
+docker_npc = NPC(700, 200,docker_text)
+start_npc = Helm_NPC(200,450, start_text)
+  # Adjust position as needed
+all_sprites.add(kube_npc, docker_npc, start_npc)
+npcs.add(kube_npc, docker_npc, start_npc)
 font = pygame.freetype.SysFont('firacode', 20)
 # Main loop
 running = True
