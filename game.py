@@ -120,7 +120,6 @@ class Helm_NPC(pygame.sprite.Sprite):
                 p.frozen = True
                 self.is_colliding = True
                 player = p
-        if self.is_colliding:
             if pygame.key.get_pressed()[pygame.K_y]:
                 self.spoken_y = True
                 self.col += 1
@@ -173,13 +172,28 @@ start_npc = Helm_NPC(200,450, start_text)
 all_sprites.add(kube_npc, docker_npc, start_npc)
 npcs.add(kube_npc, docker_npc, start_npc)
 font = pygame.freetype.SysFont('firacode', 20)
+
+# Font for rendering text
+font_input = pygame.font.Font(None, 32)
+
 # Main loop
 running = True
+user_input = ""
 while running:
     # Handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                print("User input:", user_input)
+                user_input = ""
+            elif event.key == pygame.K_BACKSPACE:
+                user_input = user_input[:-1]
+            elif event.key >= 32 and event.key <= 126:  # Only handle printable ASCII characters
+                user_input += event.unicode
 
     screen.fill(WHITE)
     # Update
@@ -187,6 +201,10 @@ while running:
 
     # Draw
     all_sprites.draw(screen)
+
+    # Render user input text
+    input_text_surface = font_input.render(user_input, True, BLACK)
+    screen.blit(input_text_surface, (20, 20))
 
     # Refresh the display
     pygame.display.flip()
