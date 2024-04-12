@@ -45,9 +45,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.x += self.dx
             self.rect.y += self.dy
         collisions = pygame.sprite.spritecollide(self, npcs, False)
-        for npc in collisions:
-            if self.is_colliding:
-                self.rect.center = (self.rect.centerx - self.dx, self.rect.centery - self.dy)
+        if collisions:
             self.is_colliding = True
 
         self.rect.left = max(self.rect.left, 0)
@@ -66,19 +64,33 @@ class NPC(pygame.sprite.Sprite):
         self.is_colliding = False
         self.col = 0 
         self.text = text
+        self.last_keypress = 0
+        self.spoken = False
     def update(self, *args, **kwargs) -> None:
 
         collisions = pygame.sprite.spritecollide(self, players, False)
-        if not collisions:
-            self.is_colliding = False
-        for player in collisions:
+        player = None
+        for p in collisions:
+            if self.spoken:
+                p.rect.x -= p.dx
+                p.rect.y -= p.dy
+            else:
+                p.frozen = True
+                self.is_colliding = True
+                player = p
+        if self.is_colliding:
             if pygame.key.get_pressed()[pygame.K_RETURN]:
-                self.col += 1
-            self.is_colliding = True
+                curr_keypress = pygame.time.get_ticks()
+                if curr_keypress - self.last_keypress > 1000:
+                    self.col += 1
+                    self.last_keypress = curr_keypress
             if self.col < len(self.text):
                 word_wrap(screen, self.text[self.col], font, BLACK)
             else:
                 player.frozen = False
+                self.is_colliding = False
+                player.is_colliding = False
+                self.spoken = True
 
 
 
