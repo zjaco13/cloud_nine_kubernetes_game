@@ -26,6 +26,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = (screen_width // 2, screen_height // 2)
         self.dx = 0
         self.dy = 0
+        self.frozen = False
+        self.is_colliding = False
     def update(self, *args, **kwargs):
         key = pygame.key.get_pressed()
         self.dx = 0
@@ -39,19 +41,19 @@ class Player(pygame.sprite.Sprite):
             self.dx+= dist
         elif key[pygame.K_a]: # left key
             self.dx-= dist
-        self.rect.x += self.dx
-        self.rect.y += self.dy
+        if not self.frozen:
+            self.rect.x += self.dx
+            self.rect.y += self.dy
         collisions = pygame.sprite.spritecollide(self, npcs, False)
-        #for npc in collisions:
+        for npc in collisions:
+            if self.is_colliding:
+                self.rect.center = (self.rect.centerx - self.dx, self.rect.centery - self.dy)
+            self.is_colliding = True
 
         self.rect.left = max(self.rect.left, 0)
         self.rect.top = max(self.rect.top, 0)
         self.rect.bottom = min(self.rect.bottom, screen_height)
         self.rect.right = min(self.rect.right, screen_width)
-    def draw(self, surface):
-        """ Draw on surface """
-        # blit yourself at your current position
-        surface.blit(self.image, (self.rect.x, self.rect.y))
 
 # Define NPC class
 class NPC(pygame.sprite.Sprite):
@@ -62,7 +64,7 @@ class NPC(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.is_colliding = False
-        self.col = -1
+        self.col = 0 
         self.text = text
     def update(self, *args, **kwargs) -> None:
 
@@ -70,14 +72,13 @@ class NPC(pygame.sprite.Sprite):
         if not collisions:
             self.is_colliding = False
         for player in collisions:
-            if self.is_colliding:
-                player.rect.center = (player.rect.centerx - player.dx, player.rect.centery -player.dy)
-            if not self.is_colliding:
+            if pygame.key.get_pressed()[pygame.K_RETURN]:
                 self.col += 1
-                print(self.col)
             self.is_colliding = True
             if self.col < len(self.text):
                 word_wrap(screen, self.text[self.col], font, BLACK)
+            else:
+                player.frozen = False
 
 
 
