@@ -22,7 +22,8 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.Surface((50, 50))
-        self.image.fill(RED)
+        self.sprite = pygame.image.load('sprites/shipSprite.jpg')
+        self.sprite = pygame.transform.scale(self.sprite, (50, 50))
         self.rect = self.image.get_rect()
         self.rect.center = (screen_width // 2, screen_height // 2)
         self.dx = 0
@@ -187,6 +188,7 @@ while running:
 
     # Draw
     all_sprites.draw(screen)
+    screen.blit(player.sprite, player.rect)
 
     # Refresh the display
     pygame.display.flip()
