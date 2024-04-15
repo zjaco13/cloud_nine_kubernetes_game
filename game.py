@@ -88,7 +88,7 @@ def render_main_menu():
     screen.fill(WHITE)
 
     # Render title of the game on the screen
-    title = font.render("Game's Name Space", True, BLACK)
+    title = font.render("Kubernetes Pirate Adventure", True, BLACK)
     title_rect = title.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
     screen.blit(title, title_rect)
 
@@ -152,7 +152,7 @@ def render_new_screen2():
 
     # Render content for the new screen 2
     font_16 = pygame.font.Font(None, 16)
-    text = font_16.render("The purpose is to teach you about how to build a ML application, deploy it on the cloud using open source tooling, like Docker and Kubernetes", True, WHITE)
+    text = font_16.render("The purpose of this game is to teach you about open source tools that are critical to know for todays cloud focused environment.  The 2 tools focused on in this game are Docker and Kubernetes.  With a grasp of these tools, you will be primed for success when developing and deploying your application to the world", True, WHITE)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
 
@@ -170,7 +170,7 @@ def render_new_screen3():
     screen.fill(BLACK)
 
     # Render content for the new screen 3
-    text = font.render("Teams: Zach Jacobson, Phong Duong, Om Patel, Shreiyas Saraf", True, WHITE)
+    text = font.render("Team: Zach Jacobson, Phong Duong, Om Patel, Shreiyas Saraf", True, WHITE)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
 
@@ -188,7 +188,7 @@ def render_new_screen4():
     screen.fill(BLACK)
 
     # Render content for the new screen 4
-    text = font.render("Tutorial: Use wasd to move around, enter to interact", True, WHITE)
+    text = font.render("Tutorial: Use wasd to move around your player and the ship. Use Enter to interact with characters", True, WHITE)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
 
