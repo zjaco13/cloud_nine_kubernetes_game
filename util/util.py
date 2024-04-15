@@ -9,6 +9,10 @@ font = pygame.freetype.Font(None, 36)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
+RED = (255, 0, 0)
+BLUE = (0,0, 255)
+BROWN = (139, 69, 19)
+OCEAN_BLUE = (25, 25, 112)
 
 def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_color=(205, 133, 63)):
     font.origin = True

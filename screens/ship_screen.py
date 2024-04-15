@@ -1,31 +1,30 @@
 import pygame
 import sys
-import pygame.freetype
-from util.util import word_wrap_with_box
+from util.util import word_wrap_with_box, font, WHITE, RED, BLACK, BLUE, OCEAN_BLUE, BROWN
 
-# Define colors
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-BLACK = (0, 0, 0)
-BLUE = (0,0, 255)
-BROWN = (139, 69, 19)
-OCEAN_BLUE = (25, 25, 112)
+pygame.init()
 
 boat_width = 1100
 boat_height = 650 
-boat_x = (screen_width - boat_width) // 2
-boat_y = (screen_height - boat_height) // 2
-boat_rect = pygame.Rect(boat_x, boat_y, boat_width, boat_height)
+kube_text = ["Kubernetes is a portable, extensible, open source platform for managing containerized workloads and services, that facilitates both declarative configuration and automation. It has a large, rapidly growing ecosystem. Kubernetes services, support, and tools are widely available.", "Kubernetes provides you with a framework to run distributed systems resiliently. It takes care of scaling and failover for your application, provides deployment patterns, and more.", "Kubernetes runs your workload by placing containers into Pods to run on Nodes. A node may be a virtual or physical machine, depending on the cluster. Each node is managed by the control plane and contains the services necessary to run Pods."]
+docker_text = [
+"Docker is an open platform for developing, shipping, and running applications. Docker enables you to separate your applications from your infrastructure so you can deliver software quickly. With Docker, you can manage your infrastructure in the same ways you manage your applications. By taking advantage of Docker's methodologies for shipping, testing, and deploying code, you can significantly reduce the delay between writing code and running it in production.", 
+"Docker provides the ability to package and run an application in a loosely isolated environment called a container. The isolation and security lets you run many containers simultaneously on a given host. Containers are lightweight and contain everything needed to run the application, so you don't need to rely on what's installed on the host. You can share containers while you work, and be sure that everyone you share with gets the same container that works in the same way.", "Docker's container-based platform allows for highly portable workloads. Docker containers can run on a developer's local laptop, on physical or virtual machines in a data center, on cloud providers, or in a mixture of environments. Docker's portability and lightweight nature also make it easy to dynamically manage workloads, scaling up or tearing down applications and services as business needs dictate, in near real time."]
+start_text = ["Set Sail? (Y/N)"]
+all_sprites = pygame.sprite.Group()
+players = pygame.sprite.Group()
+npcs = pygame.sprite.Group()
 
 # Define player class
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, boat_rect):
         super().__init__()
+        self.boat_rect = boat_rect
         self.image = pygame.Surface((50, 80))
         self.sprite = pygame.image.load('sprites/humanSprite.jpg')
         self.sprite = pygame.transform.scale(self.sprite, (50, 80))
         self.rect = self.image.get_rect()
-        self.rect.center = (screen_width // 2, screen_height // 2)
+        self.rect.center = (boat_rect.x + boat_width// 2, boat_rect.y + boat_height// 2)
         self.dx = 0
         self.dy = 0
         self.frozen = False
@@ -50,11 +49,7 @@ class Player(pygame.sprite.Sprite):
         if collisions:
             self.is_colliding = True
 
-        self.rect.clamp_ip(boat_rect)
-        # self.rect.left = max(self.rect.left, 0)
-        # self.rect.top = max(self.rect.top, 0)
-        # self.rect.bottom = min(self.rect.bottom, screen_height)
-        # self.rect.right = min(self.rect.right, screen_width)
+        self.rect.clamp_ip(self.boat_rect)
 
 
 # Define NPC class
@@ -72,7 +67,11 @@ class NPC(pygame.sprite.Sprite):
         self.last_keypress = 0
         self.spoken = False
     def update(self, *args, **kwargs) -> None:
-
+        screen = None
+        if len(args) > 0:
+            screen = args[0]
+        else:
+            raise ValueError("Missing Screen argument")
         collisions = pygame.sprite.spritecollide(self, players, False)
         player = None
         for p in collisions:
@@ -111,6 +110,11 @@ class Helm_NPC(pygame.sprite.Sprite):
         self.spoken_y = False
         self.spoken_n = False
     def update(self, *args, **kwargs) -> None:
+        screen = None
+        if len(args) > 0:
+            screen = args[0]
+        else:
+            raise ValueError("Missing Screen argument")
         collisions = pygame.sprite.spritecollide(self, players, False)
         player = None
         if not collisions and self.spoken_n:
@@ -139,51 +143,44 @@ class Helm_NPC(pygame.sprite.Sprite):
                 self.is_colliding = False
                 player.is_colliding = False
 
-# Create sprite groups
-all_sprites = pygame.sprite.Group()
-players = pygame.sprite.Group()
-npcs = pygame.sprite.Group()
-
-# Create player and NPC objects
-player = Player()
-all_sprites.add(player)
-players.add(player)
-kube_text = ["Kubernetes is a portable, extensible, open source platform for managing containerized workloads and services, that facilitates both declarative configuration and automation. It has a large, rapidly growing ecosystem. Kubernetes services, support, and tools are widely available.", "Kubernetes provides you with a framework to run distributed systems resiliently. It takes care of scaling and failover for your application, provides deployment patterns, and more.", "Kubernetes runs your workload by placing containers into Pods to run on Nodes. A node may be a virtual or physical machine, depending on the cluster. Each node is managed by the control plane and contains the services necessary to run Pods."]
-docker_text = [
-"Docker is an open platform for developing, shipping, and running applications. Docker enables you to separate your applications from your infrastructure so you can deliver software quickly. With Docker, you can manage your infrastructure in the same ways you manage your applications. By taking advantage of Docker's methodologies for shipping, testing, and deploying code, you can significantly reduce the delay between writing code and running it in production.", 
-"Docker provides the ability to package and run an application in a loosely isolated environment called a container. The isolation and security lets you run many containers simultaneously on a given host. Containers are lightweight and contain everything needed to run the application, so you don't need to rely on what's installed on the host. You can share containers while you work, and be sure that everyone you share with gets the same container that works in the same way.", "Docker's container-based platform allows for highly portable workloads. Docker containers can run on a developer's local laptop, on physical or virtual machines in a data center, on cloud providers, or in a mixture of environments. Docker's portability and lightweight nature also make it easy to dynamically manage workloads, scaling up or tearing down applications and services as business needs dictate, in near real time."]
-start_text = ["Set Sail? (Y/N)"]
-
-kube_npc = NPC(boat_x+700, boat_y + 150, kube_text, 'sprites/KuberNPC.jpg')
-docker_npc = NPC(boat_x+850, boat_y + 400, docker_text, 'sprites/dockerSprite.jpg')
-start_npc = Helm_NPC(boat_x+100,boat_y + boat_height//2, start_text)
-  # Adjust position as needed
-all_sprites.add(kube_npc, docker_npc, start_npc)
-npcs.add(kube_npc, docker_npc, start_npc)
-font = pygame.freetype.Font(None, 20)
-# Main loop
-running = True
-while running:
-    # Handle events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    screen.fill(OCEAN_BLUE)
-    pygame.draw.rect(screen, BROWN, boat_rect)
-    # Update
-    all_sprites.update()
-
-    # Draw
-    all_sprites.draw(screen)
-    screen.blit(player.sprite, player.rect)
-
-    # Refresh the display
-    pygame.display.flip()
-
-    # Cap the frame rate
-    pygame.time.Clock().tick(60)
-
-# Quit Pygame
-pygame.quit()
-sys.exit()
+def ship_screen(screen):
+    screen_width, screen_height = screen.get_size()
+    boat_x = (screen_width - boat_width) // 2
+    boat_y = (screen_height - boat_height) // 2
+    boat_rect = pygame.Rect(boat_x, boat_y, boat_width, boat_height)
+    # Create player and NPC objects
+    player = Player(boat_rect)
+    all_sprites.add(player)
+    players.add(player)
+    
+    kube_npc = NPC(boat_x+700, boat_y + 150, kube_text, 'sprites/KuberNPC.jpg')
+    docker_npc = NPC(boat_x+850, boat_y + 400, docker_text, 'sprites/dockerSprite.jpg')
+    start_npc = Helm_NPC(boat_x+100,boat_y + boat_height//2, start_text)
+      # Adjust position as needed
+    all_sprites.add(kube_npc, docker_npc, start_npc)
+    npcs.add(kube_npc, docker_npc, start_npc)
+    font = pygame.freetype.Font(None, 20)
+    # Main loop
+    running = True
+    while running:
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+    
+        screen.fill(OCEAN_BLUE)
+        pygame.draw.rect(screen, BROWN, boat_rect)
+        # Update
+        all_sprites.update(screen)
+    
+        # Draw
+        all_sprites.draw(screen)
+        screen.blit(player.sprite, player.rect)
+    
+        # Refresh the display
+        pygame.display.flip()
+    
+        # Cap the frame rate
+        pygame.time.Clock().tick(60)
+    pygame.exit()
+    sys.exit()

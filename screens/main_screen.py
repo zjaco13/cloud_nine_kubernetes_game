@@ -2,6 +2,7 @@ import pygame
 import sys
 import pygame.freetype
 from util.util import word_wrap, WHITE, GRAY, BLACK, font
+from screens.ship_screen import ship_screen
 
 # Define game states
 MAIN_MENU = 0
@@ -114,22 +115,8 @@ def render_main_menu(screen):
     tut_button_rect = tut_button
 
 def play_game(screen):
-    # Fill the screen with a different color
-    screen.fill(BLACK)
+    ship_screen(screen)
 
-    # Render content for the new screen 1
-    text = font.render("Play Screen", WHITE)
-    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
-    screen.blit(text, text_rect)
-
-    # Render back button
-    back_button = pygame.Rect(20, 20, 100, 50)
-    pygame.draw.rect(screen, GRAY, back_button)
-    back_text = font.render("Back", BLACK)
-    back_text_rect = back_text.get_rect(center=back_button.center)
-    screen.blit(back_text, back_text_rect)
-    global back_button_rect
-    back_button_rect = back_button
 
 def render_description(screen):
     # Fill the screen with a different color
