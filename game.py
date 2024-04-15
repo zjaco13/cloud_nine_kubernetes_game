@@ -141,7 +141,7 @@ class Helm_NPC(pygame.sprite.Sprite):
                 self.col += 1
                 self.spoken_n = True
             if self.col < len(self.text):
-                word_wrap(screen, self.text[self.col], font, BLACK)
+                word_wrap_with_box(screen, self.text[self.col], font, BLACK)
             else:
                 player.frozen = False
                 self.is_colliding = False
