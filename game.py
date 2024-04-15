@@ -169,7 +169,7 @@ def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_color=(205, 133, 6
         text_height += line_spacing + bounds.height - bounds.y
 
     # Create bounding box surface
-    box_surface = pygame.Surface((width,  line_spacing*5))
+    box_surface = pygame.Surface((width,  line_spacing*5+20))
     box_surface.fill(box_color)
     box_rect = box_surface.get_rect()
     box_rect.bottomleft = (0, height)
@@ -178,7 +178,7 @@ def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_color=(205, 133, 6
     x, y = 0, 0
     for word in words:
         bounds = font.get_rect(word)
-        if x + bounds.width + bounds.x >= width:
+        if x + bounds.width + bounds.x >= width - 10:
             x, y = 0, y + line_spacing
         font.render_to(box_surface, (x + 10, y + line_spacing), None, color)
         x += bounds.width + space.width
@@ -215,8 +215,10 @@ npcs = pygame.sprite.Group()
 player = Player()
 all_sprites.add(player)
 players.add(player)
-kube_text = ["k1", "k2", "k3"]
-docker_text = ["d1", "d2", "d3"]
+kube_text = ["Kubernetes is a portable, extensible, open source platform for managing containerized workloads and services, that facilitates both declarative configuration and automation. It has a large, rapidly growing ecosystem. Kubernetes services, support, and tools are widely available.", "Kubernetes provides you with a framework to run distributed systems resiliently. It takes care of scaling and failover for your application, provides deployment patterns, and more.", "Kubernetes runs your workload by placing containers into Pods to run on Nodes. A node may be a virtual or physical machine, depending on the cluster. Each node is managed by the control plane and contains the services necessary to run Pods."]
+docker_text = [
+"Docker is an open platform for developing, shipping, and running applications. Docker enables you to separate your applications from your infrastructure so you can deliver software quickly. With Docker, you can manage your infrastructure in the same ways you manage your applications. By taking advantage of Docker's methodologies for shipping, testing, and deploying code, you can significantly reduce the delay between writing code and running it in production.", 
+"Docker provides the ability to package and run an application in a loosely isolated environment called a container. The isolation and security lets you run many containers simultaneously on a given host. Containers are lightweight and contain everything needed to run the application, so you don't need to rely on what's installed on the host. You can share containers while you work, and be sure that everyone you share with gets the same container that works in the same way.", "Docker's container-based platform allows for highly portable workloads. Docker containers can run on a developer's local laptop, on physical or virtual machines in a data center, on cloud providers, or in a mixture of environments. Docker's portability and lightweight nature also make it easy to dynamically manage workloads, scaling up or tearing down applications and services as business needs dictate, in near real time."]
 start_text = ["Set Sail? (Y/N)"]
 
 kube_npc = NPC(boat_x+700, boat_y + 150, kube_text, 'sprites/KuberNPC.jpg')
