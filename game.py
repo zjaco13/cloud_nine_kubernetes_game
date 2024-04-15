@@ -18,44 +18,20 @@ GRAY = (200, 200, 200)
 # Set up fonts
 font = pygame.font.Font(None, 36)
 
+# Define game states
+MAIN_MENU = 0
+PLAY = 1
+DESCRIPTION = 2
+TEAM = 3
+TUTORIAL = 4
+
+# Initial game state
+current_state = MAIN_MENU
+
 def main_screen():
+    global current_state
+    
     while True:
-
-        # Fill the screen with white color
-        screen.fill(WHITE)
-
-        # Render title of the game on the screen
-        title = font.render("Game's Name Space", True, BLACK)
-        title_rect = title.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
-        screen.blit(title, title_rect)
-
-        # Render tutorial on the screen
-        font_40 = pygame.font.Font(None, 40) 
-        tutorial = font_40.render("Tutorial: Use wasd to move around, enter to interact", True, BLACK)
-        tutorial_rect = tutorial.get_rect(topleft=(0, 20))
-        screen.blit(tutorial, tutorial_rect)
-
-        # Render description on the screen
-        font_15 = pygame.font.Font(None, 15) 
-        description = font_15.render("Description: This games will teach you about how to build a ML application, deploy it on the cloud using open source tooling, specifically Docker and Kubernetes", True, BLACK)
-        description_rect = description.get_rect(topleft=(0, 60))
-        screen.blit(description, description_rect)
-
-        # Render team member's names on the screen
-        font_20 = pygame.font.Font(None, 20) 
-        team = font_20.render("Team: Shreiyas Saraf, Phong Duong, Zach Jacobson, Om Patel", True, BLACK)
-        team_rect = team.get_rect(bottomleft=(0, screen_height - 20))
-        screen.blit(team, team_rect)
-
-        # Draw play button
-        play_button = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 50, 200, 50)
-        pygame.draw.rect(screen, GRAY, play_button)
-        play_text = font.render("Play", True, BLACK)
-        play_text_rect = play_text.get_rect(center=play_button.center)
-        screen.blit(play_text, play_text_rect)
-        global play_button_rect
-        play_button_rect = play_button
-
 
         # Handle events
         for event in pygame.event.get():
@@ -63,17 +39,127 @@ def main_screen():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # Check if the mouse click is within the play button area
-                if play_button_rect.collidepoint(event.pos):
-                    # Call a function to start the game
-                    start_game()
+                if current_state == MAIN_MENU:
+                    # Check if the mouse click is within the play button area
+                    if play_button1_rect.collidepoint(event.pos):
+                        # Change to the new screen state
+                        current_state = PLAY
+                    elif play_button2_rect.collidepoint(event.pos):
+                        current_state = DESCRIPTION
+                    elif play_button3_rect.collidepoint(event.pos):
+                        current_state = TEAM
+                    elif play_button4_rect.collidepoint(event.pos):
+                        current_state = TUTORIAL
+                elif current_state == PLAY:
+                    # Handle events specific to the PLAY screen
+                    pass
+                elif current_state == DESCRIPTION:
+                    # Handle events specific to the DESCRIPTION screen
+                    pass
+                elif current_state == TEAM:
+                    # Handle events specific to the TEAM screen 
+                    pass
+                elif current_state == TUTORIAL:
+                    # Handle events specific to the TUTORIAL screen 
+                    pass
+
+
+        # Render different screens based on current state
+        if current_state == MAIN_MENU:
+            render_main_menu()
+        elif current_state == PLAY:
+            render_new_screen1()
+        elif current_state == DESCRIPTION:
+            render_new_screen2()
+        elif current_state == TEAM:
+            render_new_screen3()
+        elif current_state == TUTORIAL:
+            render_new_screen4()
 
         # Update the display
         pygame.display.flip()
 
-def start_game():
-    # Here you can define the logic to start the actual game
-    print("Game started!")
+def render_main_menu():
+    # Fill the screen with white color
+    screen.fill(WHITE)
+
+    # Render title of the game on the screen
+    title = font.render("Game's Name Space", True, BLACK)
+    title_rect = title.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
+    screen.blit(title, title_rect)
+
+    # Draw play button 1 - PLAY
+    play_button1 = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 50, 200, 50)
+    pygame.draw.rect(screen, GRAY, play_button1)
+    play_text1 = font.render("PLAY", True, BLACK)
+    play_text_rect1 = play_text1.get_rect(center=play_button1.center)
+    screen.blit(play_text1, play_text_rect1)
+    global play_button1_rect
+    play_button1_rect = play_button1
+
+    # Draw play button 2 - DESCRIPTION
+    play_button2 = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 120, 200, 50)
+    pygame.draw.rect(screen, GRAY, play_button2)
+    play_text2 = font.render("DESCRIPTION", True, BLACK)
+    play_text_rect2 = play_text2.get_rect(center=play_button2.center)
+    screen.blit(play_text2, play_text_rect2)
+    global play_button2_rect
+    play_button2_rect = play_button2
+
+    # Draw play button 3 - TEAM
+    play_button3 = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 190, 200, 50)
+    pygame.draw.rect(screen, GRAY, play_button3)
+    play_text3 = font.render("TEAM", True, BLACK)
+    play_text_rect3 = play_text3.get_rect(center=play_button3.center)
+    screen.blit(play_text3, play_text_rect3)
+    global play_button3_rect
+    play_button3_rect = play_button3
+
+    # Draw play button 3 - TUTORIAL
+    play_button4 = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 260, 200, 50)
+    pygame.draw.rect(screen, GRAY, play_button4)
+    play_text4 = font.render("TUTORIAL", True, BLACK)
+    play_text_rect4 = play_text4.get_rect(center=play_button4.center)
+    screen.blit(play_text4, play_text_rect4)
+    global play_button4_rect
+    play_button4_rect = play_button4
+
+def render_new_screen1():
+    # Fill the screen with a different color
+    screen.fill(BLACK)
+
+    # Render content for the new screen 1
+    text = font.render("Play Screen", True, WHITE)
+    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
+    screen.blit(text, text_rect)
+
+def render_new_screen2():
+    # Fill the screen with a different color
+    screen.fill(BLACK)
+
+    # Render content for the new screen 2
+    font_16 = pygame.font.Font(None, 16)
+    text = font_16.render("The purpose is to teach you about how to build a ML application, deploy it on the cloud using open source tooling, like Docker and Kubernetes", True, WHITE)
+    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
+    screen.blit(text, text_rect)
+
+def render_new_screen3():
+    # Fill the screen with a different color
+    screen.fill(BLACK)
+
+    # Render content for the new screen 3
+    text = font.render("Teams: Zach Jacobson, Phong Duong, Om Patel, Shreiyas Saraf", True, WHITE)
+    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
+    screen.blit(text, text_rect)
+
+def render_new_screen4():
+    # Fill the screen with a different color
+    screen.fill(BLACK)
+
+    # Render content for the new screen 4
+    text = font.render("Tutorial: Use wasd to move around, enter to interact", True, WHITE)
+    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
+    screen.blit(text, text_rect)
 
 if __name__ == "__main__":
     main_screen()
