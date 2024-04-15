@@ -1,22 +1,7 @@
 import pygame
 import sys
-
-# Initialize Pygame
-pygame.init()
-
-# Set up the screen dimensions
-screen_width = 800
-screen_height = 700
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Main Screen")
-
-# Set up colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GRAY = (200, 200, 200)
-
-# Set up fonts
-font = pygame.font.Font(None, 36)
+import pygame.freetype
+from util.util import word_wrap, WHITE, GRAY, BLACK, font
 
 # Define game states
 MAIN_MENU = 0
@@ -28,7 +13,7 @@ TUTORIAL = 4
 # Initial game state
 current_state = MAIN_MENU
 
-def main_screen():
+def main_screen(screen):
     global current_state
     
     while True:
@@ -41,14 +26,14 @@ def main_screen():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if current_state == MAIN_MENU:
                     # Check if the mouse click is within the play button area
-                    if play_button1_rect.collidepoint(event.pos):
+                    if play_button_rect.collidepoint(event.pos):
                         # Change to the new screen state
                         current_state = PLAY
-                    elif play_button2_rect.collidepoint(event.pos):
+                    elif description_button_rect.collidepoint(event.pos):
                         current_state = DESCRIPTION
-                    elif play_button3_rect.collidepoint(event.pos):
+                    elif team_button_rect.collidepoint(event.pos):
                         current_state = TEAM
-                    elif play_button4_rect.collidepoint(event.pos):
+                    elif tut_button_rect.collidepoint(event.pos):
                         current_state = TUTORIAL
                 elif current_state == PLAY:
                     # Handle events specific to the PLAY screen
@@ -70,136 +55,132 @@ def main_screen():
 
         # Render different screens based on current state
         if current_state == MAIN_MENU:
-            render_main_menu()
+            render_main_menu(screen)
         elif current_state == PLAY:
-            render_new_screen1()
+            play_game(screen)
         elif current_state == DESCRIPTION:
-            render_new_screen2()
+            render_description(screen)
         elif current_state == TEAM:
-            render_new_screen3()
+            render_team(screen)
         elif current_state == TUTORIAL:
-            render_new_screen4()
+            render_tutorial(screen)
 
         # Update the display
         pygame.display.flip()
 
-def render_main_menu():
+def render_main_menu(screen):
     # Fill the screen with white color
     screen.fill(WHITE)
+    screen_width, screen_height = screen.get_size()
 
     # Render title of the game on the screen
-    title = font.render("Kubernetes Pirate Adventure", True, BLACK)
-    title_rect = title.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
-    screen.blit(title, title_rect)
+    font.render_to(screen, (screen_width // 2, screen_height // 2 - 50), "Kubernetes Pirate Adventure", BLACK)
+
 
     # Draw play button 1 - PLAY
-    play_button1 = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 50, 200, 50)
-    pygame.draw.rect(screen, GRAY, play_button1)
-    play_text1 = font.render("PLAY", True, BLACK)
-    play_text_rect1 = play_text1.get_rect(center=play_button1.center)
-    screen.blit(play_text1, play_text_rect1)
-    global play_button1_rect
-    play_button1_rect = play_button1
+    play_button = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 50, 300, 50)
+    pygame.draw.rect(screen, GRAY, play_button)
+    play_text, _ = font.render("PLAY", BLACK)
+    play_text_rect = play_text.get_rect(center = play_button.center)
+    screen.blit(play_text, play_text_rect)
+    global play_button_rect
+    play_button_rect = play_button
 
     # Draw play button 2 - DESCRIPTION
-    play_button2 = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 120, 200, 50)
-    pygame.draw.rect(screen, GRAY, play_button2)
-    play_text2 = font.render("DESCRIPTION", True, BLACK)
-    play_text_rect2 = play_text2.get_rect(center=play_button2.center)
-    screen.blit(play_text2, play_text_rect2)
-    global play_button2_rect
-    play_button2_rect = play_button2
+    description_button = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 120, 300, 50)
+    pygame.draw.rect(screen, GRAY, description_button)
+    description_text,_ = font.render("DESCRIPTION", BLACK)
+    description_text_rect = description_text.get_rect(center=description_button.center)
+    screen.blit(description_text, description_text_rect)
+    global description_button_rect 
+    description_button_rect = description_button
 
     # Draw play button 3 - TEAM
-    play_button3 = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 190, 200, 50)
-    pygame.draw.rect(screen, GRAY, play_button3)
-    play_text3 = font.render("TEAM", True, BLACK)
-    play_text_rect3 = play_text3.get_rect(center=play_button3.center)
-    screen.blit(play_text3, play_text_rect3)
-    global play_button3_rect
-    play_button3_rect = play_button3
+    team_button = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 190, 300, 50)
+    pygame.draw.rect(screen, GRAY, team_button)
+    team_text,_ = font.render("TEAM", BLACK)
+    team_text_rect = team_text.get_rect(center=team_button.center)
+    screen.blit(team_text, team_text_rect)
+    global team_button_rect
+    team_button_rect = team_button
 
     # Draw play button 3 - TUTORIAL
-    play_button4 = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 260, 200, 50)
-    pygame.draw.rect(screen, GRAY, play_button4)
-    play_text4 = font.render("TUTORIAL", True, BLACK)
-    play_text_rect4 = play_text4.get_rect(center=play_button4.center)
-    screen.blit(play_text4, play_text_rect4)
-    global play_button4_rect
-    play_button4_rect = play_button4
+    tut_button = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 260, 300, 50)
+    pygame.draw.rect(screen, GRAY, tut_button)
+    tut_text,_ = font.render("TUTORIAL", BLACK)
+    tut_text_rect = tut_text.get_rect(center=tut_button.center)
+    screen.blit(tut_text, tut_text_rect)
+    global tut_button_rect
+    tut_button_rect = tut_button
 
-def render_new_screen1():
+def play_game(screen):
     # Fill the screen with a different color
     screen.fill(BLACK)
 
     # Render content for the new screen 1
-    text = font.render("Play Screen", True, WHITE)
+    text = font.render("Play Screen", WHITE)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
 
     # Render back button
     back_button = pygame.Rect(20, 20, 100, 50)
     pygame.draw.rect(screen, GRAY, back_button)
-    back_text = font.render("Back", True, BLACK)
+    back_text = font.render("Back", BLACK)
     back_text_rect = back_text.get_rect(center=back_button.center)
     screen.blit(back_text, back_text_rect)
     global back_button_rect
     back_button_rect = back_button
 
-def render_new_screen2():
+def render_description(screen):
     # Fill the screen with a different color
     screen.fill(BLACK)
 
-    # Render content for the new screen 2
-    font_16 = pygame.font.Font(None, 16)
-    text = font_16.render("The purpose of this game is to teach you about open source tools that are critical to know for todays cloud focused environment.  The 2 tools focused on in this game are Docker and Kubernetes.  With a grasp of these tools, you will be primed for success when developing and deploying your application to the world", True, WHITE)
-    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
-    screen.blit(text, text_rect)
+
+    word_wrap(screen, "The purpose of this game is to teach you about open source tools that are critical to know for todays cloud focused environment.  The 2 tools focused on in this game are Docker and Kubernetes.  With a grasp of these tools, you will be primed for success when developing and deploying your application to the world", font, WHITE)
 
     # Render back button
     back_button = pygame.Rect(20, 20, 100, 50)
     pygame.draw.rect(screen, GRAY, back_button)
-    back_text = font.render("Back", True, BLACK)
+    back_text, _ = font.render("Back", BLACK)
     back_text_rect = back_text.get_rect(center=back_button.center)
     screen.blit(back_text, back_text_rect)
     global back_button_rect
     back_button_rect = back_button
 
-def render_new_screen3():
+def render_team(screen):
     # Fill the screen with a different color
     screen.fill(BLACK)
+    screen_width, screen_height = screen.get_size()
 
     # Render content for the new screen 3
-    text = font.render("Team: Zach Jacobson, Phong Duong, Om Patel, Shreiyas Saraf", True, WHITE)
+    text, _ = font.render("Team: Zach Jacobson, Phong Duong, Om Patel, Shreiyas Saraf", WHITE)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
 
     # Render back button
     back_button = pygame.Rect(20, 20, 100, 50)
     pygame.draw.rect(screen, GRAY, back_button)
-    back_text = font.render("Back", True, BLACK)
+    back_text, _ = font.render("Back", BLACK)
     back_text_rect = back_text.get_rect(center=back_button.center)
     screen.blit(back_text, back_text_rect)
     global back_button_rect
     back_button_rect = back_button
 
-def render_new_screen4():
+def render_tutorial(screen):
     # Fill the screen with a different color
     screen.fill(BLACK)
+    screen_width, screen_height = screen.get_size()
 
     # Render content for the new screen 4
-    text = font.render("Tutorial: Use wasd to move around your player and the ship. Use Enter to interact with characters", True, WHITE)
+    text, _ = font.render("Tutorial: Use wasd to move around your player and the ship. Use Enter to interact with characters", WHITE)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
 
     # Render back button
     back_button = pygame.Rect(20, 20, 100, 50)
     pygame.draw.rect(screen, GRAY, back_button)
-    back_text = font.render("Back", True, BLACK)
+    back_text, _ = font.render("Back", BLACK)
     back_text_rect = back_text.get_rect(center=back_button.center)
     screen.blit(back_text, back_text_rect)
     global back_button_rect
     back_button_rect = back_button
-
-if __name__ == "__main__":
-    main_screen()

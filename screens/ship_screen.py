@@ -1,16 +1,7 @@
 import pygame
 import sys
 import pygame.freetype
-from .util import word_wrap_with_box
-
-# Initialize Pygame
-pygame.init()
-
-# Set up the screen
-screen_width = 1280 
-screen_height = 900 
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Kubernetes Game")
+from util.util import word_wrap_with_box
 
 # Define colors
 WHITE = (255, 255, 255)

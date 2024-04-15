@@ -1,4 +1,14 @@
 import pygame
+import pygame.freetype
+
+pygame.init()
+
+
+font = pygame.freetype.Font(None, 36)
+# Set up colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GRAY = (200, 200, 200)
 
 def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_color=(205, 133, 63)):
     font.origin = True
