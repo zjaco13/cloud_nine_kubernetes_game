@@ -1,7 +1,7 @@
 import pygame
 import sys
 import pygame.freetype
-from .Util import word_wrap_with_box
+from .util import word_wrap_with_box
 
 # Initialize Pygame
 pygame.init()
