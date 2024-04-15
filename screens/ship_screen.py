@@ -100,7 +100,7 @@ class Helm_NPC(pygame.sprite.Sprite):
     def __init__(self, x, y, text):
         super().__init__()
         self.image = pygame.Surface((50, 80))
-        self.sprite = pygame.image.load('sprites/humanSprite.jpg')
+        self.sprite = pygame.image.load('sprites/helmNPC.jpg')
         self.sprite = pygame.transform.scale(self.sprite, (50, 80))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -176,6 +176,9 @@ def ship_screen(screen):
         # Draw
         all_sprites.draw(screen)
         screen.blit(player.sprite, player.rect)
+        screen.blit(kube_npc.sprite, kube_npc.rect)
+        screen.blit(docker_npc.sprite, docker_npc.rect)
+        screen.blit(start_npc.sprite, start_npc.rect)
     
         # Refresh the display
         pygame.display.flip()
