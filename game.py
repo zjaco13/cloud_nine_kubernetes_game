@@ -16,14 +16,22 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 BLUE = (0,0, 255)
+BROWN = (139, 69, 19)
+OCEAN_BLUE = (25, 25, 112)
+
+boat_width = 1100
+boat_height = 650 
+boat_x = (screen_width - boat_width) // 2
+boat_y = (screen_height - boat_height) // 2
+boat_rect = pygame.Rect(boat_x, boat_y, boat_width, boat_height)
 
 # Define player class
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((50, 50))
-        self.sprite = pygame.image.load('sprites/shipSprite.jpg')
-        self.sprite = pygame.transform.scale(self.sprite, (50, 50))
+        self.image = pygame.Surface((50, 80))
+        self.sprite = pygame.image.load('sprites/humanSprite.jpg')
+        self.sprite = pygame.transform.scale(self.sprite, (50, 80))
         self.rect = self.image.get_rect()
         self.rect.center = (screen_width // 2, screen_height // 2)
         self.dx = 0
@@ -50,17 +58,20 @@ class Player(pygame.sprite.Sprite):
         if collisions:
             self.is_colliding = True
 
-        self.rect.left = max(self.rect.left, 0)
-        self.rect.top = max(self.rect.top, 0)
-        self.rect.bottom = min(self.rect.bottom, screen_height)
-        self.rect.right = min(self.rect.right, screen_width)
+        self.rect.clamp_ip(boat_rect)
+        # self.rect.left = max(self.rect.left, 0)
+        # self.rect.top = max(self.rect.top, 0)
+        # self.rect.bottom = min(self.rect.bottom, screen_height)
+        # self.rect.right = min(self.rect.right, screen_width)
+
 
 # Define NPC class
 class NPC(pygame.sprite.Sprite):
-    def __init__(self, x, y, text):
+    def __init__(self, x, y, text, image):
         super().__init__()
-        self.image = pygame.Surface((50, 50))
-        self.image.fill(BLACK)
+        self.image = pygame.Surface((50, 80))
+        self.sprite = pygame.image.load(image)
+        self.sprite = pygame.transform.scale(self.sprite, (50, 80))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.is_colliding = False
@@ -83,11 +94,11 @@ class NPC(pygame.sprite.Sprite):
         if self.is_colliding:
             if pygame.key.get_pressed()[pygame.K_RETURN]:
                 curr_keypress = pygame.time.get_ticks()
-                if curr_keypress - self.last_keypress > 750:
+                if curr_keypress - self.last_keypress > 500:
                     self.col += 1
                     self.last_keypress = curr_keypress
             if self.col < len(self.text):
-                word_wrap(screen, self.text[self.col], font, BLACK)
+                word_wrap_with_box(screen, self.text[self.col], font, BLACK)
             else:
                 player.frozen = False
                 self.is_colliding = False
@@ -97,8 +108,9 @@ class NPC(pygame.sprite.Sprite):
 class Helm_NPC(pygame.sprite.Sprite):
     def __init__(self, x, y, text):
         super().__init__()
-        self.image = pygame.Surface((50, 50))
-        self.image.fill(BLUE)
+        self.image = pygame.Surface((50, 80))
+        self.sprite = pygame.image.load('sprites/humanSprite.jpg')
+        self.sprite = pygame.transform.scale(self.sprite, (50, 80))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.is_colliding = False
@@ -135,6 +147,46 @@ class Helm_NPC(pygame.sprite.Sprite):
                 self.is_colliding = False
                 player.is_colliding = False
 
+def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_color=(205, 133, 63)):
+    font.origin = True
+    words = text.split(' ')
+    width, height = surf.get_size()
+    line_spacing = font.get_sized_height() + 2
+    space = font.get_rect(' ')
+    
+    # Calculate text size
+    text_width = 0
+    text_height = 0
+    for word in words:
+        bounds = font.get_rect(word)
+        text_width += bounds.width + space.width
+        if text_width > width:  # Adjust text width to fit within screen width
+            text_width = width
+            break
+        if text_height + line_spacing + bounds.height - bounds.y > height:  # Adjust text height to fit within screen height
+            text_height = height
+            break
+        text_height += line_spacing + bounds.height - bounds.y
+
+    # Create bounding box surface
+    box_surface = pygame.Surface((width,  line_spacing*5))
+    box_surface.fill(box_color)
+    box_rect = box_surface.get_rect()
+    box_rect.bottomleft = (0, height)
+
+    # Render text onto the box surface
+    x, y = 0, 0
+    for word in words:
+        bounds = font.get_rect(word)
+        if x + bounds.width + bounds.x >= width:
+            x, y = 0, y + line_spacing
+        font.render_to(box_surface, (x + 10, y + line_spacing), None, color)
+        x += bounds.width + space.width
+
+    screen.blit(box_surface, box_rect)  # Blit the text surface onto the screen
+    pygame.draw.rect(screen, (0, 0, 0), box_rect, 2)  # Draw the bounding box around the text
+    return box_surface, box_rect
+
 def word_wrap(surf, text, font, color=(0, 0, 0)):
     font.origin = True
     words = text.split(' ')
@@ -167,9 +219,9 @@ kube_text = ["k1", "k2", "k3"]
 docker_text = ["d1", "d2", "d3"]
 start_text = ["Set Sail? (Y/N)"]
 
-kube_npc = NPC(300, 800, kube_text)
-docker_npc = NPC(700, 200,docker_text)
-start_npc = Helm_NPC(200,450, start_text)
+kube_npc = NPC(boat_x+700, boat_y + 150, kube_text, 'sprites/KuberNPC.jpg')
+docker_npc = NPC(boat_x+850, boat_y + 400, docker_text, 'sprites/dockerSprite.jpg')
+start_npc = Helm_NPC(boat_x+100,boat_y + boat_height//2, start_text)
   # Adjust position as needed
 all_sprites.add(kube_npc, docker_npc, start_npc)
 npcs.add(kube_npc, docker_npc, start_npc)
@@ -182,7 +234,8 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    screen.fill(WHITE)
+    screen.fill(OCEAN_BLUE)
+    pygame.draw.rect(screen, BROWN, boat_rect)
     # Update
     all_sprites.update()
 
