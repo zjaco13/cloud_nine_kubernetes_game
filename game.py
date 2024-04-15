@@ -52,16 +52,20 @@ def main_screen():
                         current_state = TUTORIAL
                 elif current_state == PLAY:
                     # Handle events specific to the PLAY screen
-                    pass
+                    if back_button_rect.collidepoint(event.pos):
+                        current_state = MAIN_MENU
                 elif current_state == DESCRIPTION:
                     # Handle events specific to the DESCRIPTION screen
-                    pass
+                    if back_button_rect.collidepoint(event.pos):
+                        current_state = MAIN_MENU
                 elif current_state == TEAM:
                     # Handle events specific to the TEAM screen 
-                    pass
+                    if back_button_rect.collidepoint(event.pos):
+                        current_state = MAIN_MENU
                 elif current_state == TUTORIAL:
                     # Handle events specific to the TUTORIAL screen 
-                    pass
+                    if back_button_rect.collidepoint(event.pos):
+                        current_state = MAIN_MENU
 
 
         # Render different screens based on current state
@@ -133,6 +137,15 @@ def render_new_screen1():
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
 
+    # Render back button
+    back_button = pygame.Rect(20, 20, 100, 50)
+    pygame.draw.rect(screen, GRAY, back_button)
+    back_text = font.render("Back", True, BLACK)
+    back_text_rect = back_text.get_rect(center=back_button.center)
+    screen.blit(back_text, back_text_rect)
+    global back_button_rect
+    back_button_rect = back_button
+
 def render_new_screen2():
     # Fill the screen with a different color
     screen.fill(BLACK)
@@ -143,6 +156,15 @@ def render_new_screen2():
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
 
+    # Render back button
+    back_button = pygame.Rect(20, 20, 100, 50)
+    pygame.draw.rect(screen, GRAY, back_button)
+    back_text = font.render("Back", True, BLACK)
+    back_text_rect = back_text.get_rect(center=back_button.center)
+    screen.blit(back_text, back_text_rect)
+    global back_button_rect
+    back_button_rect = back_button
+
 def render_new_screen3():
     # Fill the screen with a different color
     screen.fill(BLACK)
@@ -152,6 +174,15 @@ def render_new_screen3():
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
 
+    # Render back button
+    back_button = pygame.Rect(20, 20, 100, 50)
+    pygame.draw.rect(screen, GRAY, back_button)
+    back_text = font.render("Back", True, BLACK)
+    back_text_rect = back_text.get_rect(center=back_button.center)
+    screen.blit(back_text, back_text_rect)
+    global back_button_rect
+    back_button_rect = back_button
+
 def render_new_screen4():
     # Fill the screen with a different color
     screen.fill(BLACK)
@@ -160,6 +191,15 @@ def render_new_screen4():
     text = font.render("Tutorial: Use wasd to move around, enter to interact", True, WHITE)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
+
+    # Render back button
+    back_button = pygame.Rect(20, 20, 100, 50)
+    pygame.draw.rect(screen, GRAY, back_button)
+    back_text = font.render("Back", True, BLACK)
+    back_text_rect = back_text.get_rect(center=back_button.center)
+    screen.blit(back_text, back_text_rect)
+    global back_button_rect
+    back_button_rect = back_button
 
 if __name__ == "__main__":
     main_screen()
