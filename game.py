@@ -22,7 +22,8 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.Surface((50, 50))
-        self.image.fill(RED)
+        self.sprite = pygame.image.load('sprites/humanSprite.jpg')
+        self.sprite = pygame.transform.scale(self.sprite, (50, 80))
         self.rect = self.image.get_rect()
         self.rect.center = (screen_width // 2, screen_height // 2)
         self.dx = 0
@@ -56,10 +57,11 @@ class Player(pygame.sprite.Sprite):
 
 # Define NPC class
 class NPC(pygame.sprite.Sprite):
-    def __init__(self, x, y, text):
+    def __init__(self, x, y, text, pic):
         super().__init__()
         self.image = pygame.Surface((50, 50))
-        self.image.fill(BLACK)
+        self.sprite = pygame.image.load(pic)
+        self.sprite = pygame.transform.scale(self.sprite, (50, 50))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.is_colliding = False
@@ -97,7 +99,8 @@ class Helm_NPC(pygame.sprite.Sprite):
     def __init__(self, x, y, text):
         super().__init__()
         self.image = pygame.Surface((50, 50))
-        self.image.fill(BLUE)
+        self.sprite = pygame.image.load('sprites/helmNPC.jpg')
+        self.sprite = pygame.transform.scale(self.sprite, (50, 80))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.is_colliding = False
@@ -165,8 +168,8 @@ kube_text = ["k1", "k2", "k3"]
 docker_text = ["d1", "d2", "d3"]
 start_text = ["Set Sail? (Y/N)"]
 
-kube_npc = NPC(300, 800, kube_text)
-docker_npc = NPC(700, 200,docker_text)
+kube_npc = NPC(300, 800, kube_text, 'sprites/KuberNPC.jpg')
+docker_npc = NPC(700, 200,docker_text, 'sprites/dockerSprite.jpg')
 start_npc = Helm_NPC(200,450, start_text)
   # Adjust position as needed
 all_sprites.add(kube_npc, docker_npc, start_npc)
@@ -201,6 +204,10 @@ while running:
 
     # Draw
     all_sprites.draw(screen)
+    screen.blit(player.sprite, player.rect)
+    screen.blit(kube_npc.sprite, kube_npc.rect)
+    screen.blit(start_npc.sprite, start_npc.rect)
+    screen.blit(docker_npc.sprite, docker_npc.rect)
 
     # Render user input text
     input_text_surface = font_input.render(user_input, True, BLACK)
