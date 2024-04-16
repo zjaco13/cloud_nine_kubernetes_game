@@ -75,11 +75,11 @@ def render_main_menu(screen):
     screen_width, screen_height = screen.get_size()
 
     # Render title of the game on the screen
-    font.render_to(screen, (screen_width // 2, screen_height // 2 - 50), "Kubernetes Pirate Adventure", BLACK)
+    font.render_to(screen, (screen_width // 2 - 200, screen_height // 2 - 50), "Kubernetes Pirate Adventure", BLACK)
 
 
     # Draw play button 1 - PLAY
-    play_button = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 50, 300, 50)
+    play_button = pygame.Rect(screen_width // 2 - 150, screen_height // 2 + 50, 300, 50)
     pygame.draw.rect(screen, GRAY, play_button)
     play_text, _ = font.render("PLAY", BLACK)
     play_text_rect = play_text.get_rect(center = play_button.center)
@@ -88,7 +88,7 @@ def render_main_menu(screen):
     play_button_rect = play_button
 
     # Draw play button 2 - DESCRIPTION
-    description_button = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 120, 300, 50)
+    description_button = pygame.Rect(screen_width // 2 - 150, screen_height // 2 + 120, 300, 50)
     pygame.draw.rect(screen, GRAY, description_button)
     description_text,_ = font.render("DESCRIPTION", BLACK)
     description_text_rect = description_text.get_rect(center=description_button.center)
@@ -97,7 +97,7 @@ def render_main_menu(screen):
     description_button_rect = description_button
 
     # Draw play button 3 - TEAM
-    team_button = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 190, 300, 50)
+    team_button = pygame.Rect(screen_width // 2 - 150, screen_height // 2 + 190, 300, 50)
     pygame.draw.rect(screen, GRAY, team_button)
     team_text,_ = font.render("TEAM", BLACK)
     team_text_rect = team_text.get_rect(center=team_button.center)
@@ -106,7 +106,7 @@ def render_main_menu(screen):
     team_button_rect = team_button
 
     # Draw play button 3 - TUTORIAL
-    tut_button = pygame.Rect(screen_width // 2 - 100, screen_height // 2 + 260, 300, 50)
+    tut_button = pygame.Rect(screen_width // 2 - 150, screen_height // 2 + 260, 300, 50)
     pygame.draw.rect(screen, GRAY, tut_button)
     tut_text,_ = font.render("TUTORIAL", BLACK)
     tut_text_rect = tut_text.get_rect(center=tut_button.center)
