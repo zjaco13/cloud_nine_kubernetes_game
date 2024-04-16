@@ -1,12 +1,8 @@
 import pygame
 import sys
-from util.util import word_wrap_with_box, font, WHITE, RED, BLACK, BLUE, OCEAN_BLUE, BROWN
-from screens.island_screen import island_screen
-
+from util.util import word_wrap_with_box, WHITE, BLACK, font
 pygame.init()
 
-boat_width = 1100
-boat_height = 650 
 kube_text = ["Kubernetes is a portable, extensible, open source platform for managing containerized workloads and services, that facilitates both declarative configuration and automation. It has a large, rapidly growing ecosystem. Kubernetes services, support, and tools are widely available.", "Kubernetes provides you with a framework to run distributed systems resiliently. It takes care of scaling and failover for your application, provides deployment patterns, and more.", "Kubernetes runs your workload by placing containers into Pods to run on Nodes. A node may be a virtual or physical machine, depending on the cluster. Each node is managed by the control plane and contains the services necessary to run Pods."]
 docker_text = [
 "Docker is an open platform for developing, shipping, and running applications. Docker enables you to separate your applications from your infrastructure so you can deliver software quickly. With Docker, you can manage your infrastructure in the same ways you manage your applications. By taking advantage of Docker's methodologies for shipping, testing, and deploying code, you can significantly reduce the delay between writing code and running it in production.", 
@@ -18,14 +14,15 @@ npcs = pygame.sprite.Group()
 
 # Define player class
 class Player(pygame.sprite.Sprite):
-    def __init__(self, boat_rect):
+    def __init__(self, screen_width, screen_height):
         super().__init__()
-        self.boat_rect = boat_rect
-        self.image = pygame.Surface((50, 80))
+        self.image = pygame.Surface((50, 50))
         self.sprite = pygame.image.load('sprites/humanSprite.jpg')
         self.sprite = pygame.transform.scale(self.sprite, (50, 80))
         self.rect = self.image.get_rect()
-        self.rect.center = (boat_rect.x + boat_width// 2, boat_rect.y + boat_height// 2)
+        self.rect.center = (screen_width // 2, screen_height // 2)
+        self.screen_height = screen_height
+        self.screen_width = screen_width
         self.dx = 0
         self.dy = 0
         self.frozen = False
@@ -50,7 +47,10 @@ class Player(pygame.sprite.Sprite):
         if collisions:
             self.is_colliding = True
 
-        self.rect.clamp_ip(self.boat_rect)
+        self.rect.left = max(self.rect.left, 0)
+        self.rect.top = max(self.rect.top, 0)
+        self.rect.bottom = min(self.rect.bottom, self.screen_height)
+        self.rect.right = min(self.rect.right, self.screen_width)
 
 
 # Define NPC class
@@ -144,49 +144,67 @@ class Helm_NPC(pygame.sprite.Sprite):
                 self.is_colliding = False
                 player.is_colliding = False
 
-def ship_screen(screen):
+def island_screen(screen):
     screen_width, screen_height = screen.get_size()
-    boat_x = (screen_width - boat_width) // 2
-    boat_y = (screen_height - boat_height) // 2
-    boat_rect = pygame.Rect(boat_x, boat_y, boat_width, boat_height)
     # Create player and NPC objects
-    player = Player(boat_rect)
+    
+    player = Player(screen_width, screen_height)
     all_sprites.add(player)
     players.add(player)
+    kube_text = ["k1", "k2", "k3"]
+    docker_text = ["d1", "d2", "d3"]
+    start_text = ["Set Sail? (Y/N)"]
     
-    kube_npc = NPC(boat_x+700, boat_y + 150, kube_text, 'sprites/KuberNPC.jpg')
-    docker_npc = NPC(boat_x+850, boat_y + 400, docker_text, 'sprites/dockerSprite.jpg')
-    start_npc = Helm_NPC(boat_x+100,boat_y + boat_height//2, start_text)
+    kube_npc = NPC(300, 800, kube_text, 'sprites/KuberNPC.jpg')
+    docker_npc = NPC(700, 200,docker_text, 'sprites/dockerSprite.jpg')
+    start_npc = Helm_NPC(200,450, start_text)
       # Adjust position as needed
     all_sprites.add(kube_npc, docker_npc, start_npc)
     npcs.add(kube_npc, docker_npc, start_npc)
+    
+    # Font for rendering text
+    font_input = pygame.font.Font(None, 32)
+    
     # Main loop
     running = True
+    user_input = ""
     while running:
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    print("User input:", user_input)
+                    user_input = ""
+                elif event.key == pygame.K_BACKSPACE:
+                    user_input = user_input[:-1]
+                elif event.key >= 32 and event.key <= 126:  # Only handle printable ASCII characters
+                    user_input += event.unicode
     
-        screen.fill(OCEAN_BLUE)
-        pygame.draw.rect(screen, BROWN, boat_rect)
+        screen.fill(WHITE)
         # Update
         all_sprites.update(screen)
     
-        if start_npc.spoken_y:
-            island_screen(screen)
-            
         # Draw
         all_sprites.draw(screen)
         screen.blit(player.sprite, player.rect)
         screen.blit(kube_npc.sprite, kube_npc.rect)
-        screen.blit(docker_npc.sprite, docker_npc.rect)
         screen.blit(start_npc.sprite, start_npc.rect)
+        screen.blit(docker_npc.sprite, docker_npc.rect)
+    
+        # Render user input text
+        input_text_surface = font_input.render(user_input, True, BLACK)
+        screen.blit(input_text_surface, (20, 20))
     
         # Refresh the display
         pygame.display.flip()
     
         # Cap the frame rate
         pygame.time.Clock().tick(60)
+    
+    # Quit Pygame
     pygame.quit()
     sys.exit()
