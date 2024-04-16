@@ -2,6 +2,7 @@ import pygame
 import docker
 
 
+pygame.init()
 
 class docker_game: 
 

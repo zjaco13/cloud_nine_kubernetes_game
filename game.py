@@ -22,11 +22,11 @@ BLUE = (0,0, 255)
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.dockerIsland = pygame.image.load("DockerImg.png").convert()
+        #self.dockerIsland = pygame.image.load("DockerImg.png").convert()
         self.image = pygame.Surface((50, 50))
         self.image.fill(RED)
         self.rect = self.image.get_rect()
-        self.rect.center = (screen_width // 2, screen_height // 2)
+        self.rect.center = (10, 10)
         self.dx = 0
         self.dy = 0
         self.frozen = False
@@ -60,11 +60,12 @@ class Player(pygame.sprite.Sprite):
 class NPC(pygame.sprite.Sprite):
     def __init__(self, x, y, text):
         super().__init__()
-        self.dockerIsland = pygame.image.load("DockerImg.png").convert()
+        #self.dockerIsland = pygame.image.load("DockerImg.png").convert()
         self.kubeIsland = None
-        self.image = screen.blit(self.dockerIsland, (x, y))
-        # self.image.fill(BLACK)
-        self.rect = self.image
+        #self.image = screen.blit(self.dockerIsland, (x, y))
+        self.image = pygame.Surface((50,50))
+        self.image.fill(BLACK)
+        self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.is_colliding = False
         self.col = 0 
@@ -100,7 +101,7 @@ class NPC(pygame.sprite.Sprite):
 class Helm_NPC(pygame.sprite.Sprite):
     def __init__(self, x, y, text):
         super().__init__()
-        self.dockerIsland = pygame.image.load("DockerImg.png").convert()
+        #self.dockerIsland = pygame.image.load("DockerImg.png").convert()
         self.image = pygame.Surface((50, 50))
         self.image.fill(BLUE)
         self.rect = self.image.get_rect()
@@ -189,8 +190,6 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.QUIT:
-            running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 print("User input:", user_input)
@@ -200,19 +199,21 @@ while running:
             elif event.key >= 32 and event.key <= 126:  # Only handle printable ASCII characters
                 user_input += event.unicode
 
-	    redirect_collisions = pygame.sprite.spritecollide(self, all_sprites[1:], False)
-		if redirect_collisions:
-		    # Redirect to the other program
-		    subprocess.Popen(["python", "docker_game.py"])
-		    pygame.quit()
-		    sys.exit()
-		other_collisions = pygame.sprite.spritecollide(self, all_sprites[0] + all_sprites[-1], False)
-		if redirect_collisions:
-		    # Redirect to the other program
-		    subprocess.Popen(["python", "docker_game.py"]) #will eventually be kubernetes.py
-		    pygame.quit()
-		    sys.exit()
-
+        redirect_collisions = pygame.sprite.spritecollide(player, npcs, False)
+        if redirect_collisions:
+            # Redirect to the other program
+            print("Here1")
+            subprocess.Popen(["python", "docker_game.py"])
+            pygame.quit()
+            sys.exit()
+            
+        other_collisions = pygame.sprite.spritecollide(player, npcs, False)
+        if redirect_collisions:  # Should be "other_collisions"
+            print("Here2")
+            # Redirect to the other program
+            subprocess.Popen(["python", "docker_game.py"])  # Will eventually be kubernetes.py
+            pygame.quit()
+            sys.exit()
 
     screen.fill(WHITE)
     # Update
