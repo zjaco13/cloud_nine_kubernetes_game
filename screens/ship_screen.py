@@ -182,5 +182,5 @@ def ship_screen(screen):
     
         # Cap the frame rate
         pygame.time.Clock().tick(60)
-    pygame.exit()
+    pygame.quit()
     sys.exit()

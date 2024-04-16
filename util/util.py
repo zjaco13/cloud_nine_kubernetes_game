@@ -4,7 +4,7 @@ import pygame.freetype
 pygame.init()
 
 
-font = pygame.freetype.Font(None, 36)
+font = pygame.freetype.Font('Minecraft.ttf', 30)
 # Set up colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
