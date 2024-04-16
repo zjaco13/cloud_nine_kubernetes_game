@@ -14,18 +14,18 @@ BLUE = (0,0, 255)
 BROWN = (139, 69, 19)
 OCEAN_BLUE = (25, 25, 112)
 
-def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_color=(205, 133, 63)):
+def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_color=(205, 133, 63), size=30):
     font.origin = True
     words = text.split(' ')
     width, height = surf.get_size()
-    line_spacing = font.get_sized_height() + 2
-    space = font.get_rect(' ')
+    line_spacing = font.get_sized_height(size) + 2
+    space = font.get_rect(' ', size=size)
     
     # Calculate text size
     text_width = 0
     text_height = 0
     for word in words:
-        bounds = font.get_rect(word)
+        bounds = font.get_rect(word, size=size)
         text_width += bounds.width + space.width
         if text_width > width:  # Adjust text width to fit within screen width
             text_width = width
@@ -44,23 +44,23 @@ def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_color=(205, 133, 6
     # Render text onto the box surface
     x, y = 0, 0
     for word in words:
-        bounds = font.get_rect(word)
+        bounds = font.get_rect(word, size=size)
         if x + bounds.width + bounds.x >= width - 10:
             x, y = 0, y + line_spacing
-        font.render_to(box_surface, (x + 10, y + line_spacing), None, color)
+        font.render_to(box_surface, (x + 10, y + line_spacing), None, color, size = size)
         x += bounds.width + space.width
 
     surf.blit(box_surface, box_rect)  # Blit the text surface onto the screen
     pygame.draw.rect(surf, (0, 0, 0), box_rect, 2)  # Draw the bounding box around the text
     return box_surface, box_rect
 
-def word_wrap(surf, text, font, color=(0, 0, 0)):
+def word_wrap(surf, text, font, color=(0, 0, 0), size = 30):
     font.origin = True
     words = text.split(' ')
     width, height = surf.get_size()
-    line_spacing = font.get_sized_height() + 2
+    line_spacing = font.get_sized_height(size) + 2
     x, y = 0, surf.get_size()[1] - line_spacing*5
-    space = font.get_rect(' ')
+    space = font.get_rect(' ', size=size)
     for word in words:
         bounds = font.get_rect(word)
         if x + bounds.width + bounds.x >= width:
@@ -69,6 +69,6 @@ def word_wrap(surf, text, font, color=(0, 0, 0)):
             raise ValueError("word too wide for the surface")
         if y + bounds.height - bounds.y >= height:
             raise ValueError("text to long for the surface")
-        font.render_to(surf, (x, y), None, color)
+        font.render_to(surf, (x, y), None, color, size = size)
         x += bounds.width + space.width
     return x, y

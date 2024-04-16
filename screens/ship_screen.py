@@ -89,7 +89,7 @@ class NPC(pygame.sprite.Sprite):
                     self.col += 1
                     self.last_keypress = curr_keypress
             if self.col < len(self.text):
-                word_wrap_with_box(screen, self.text[self.col], font, BLACK)
+                word_wrap_with_box(screen, self.text[self.col], font, BLACK, size=20)
             else:
                 player.frozen = False
                 self.is_colliding = False
