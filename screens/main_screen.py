@@ -16,6 +16,7 @@ current_state = MAIN_MENU
 
 # Load the image
 background_image = pygame.image.load('sprites/background.jpg')
+background2_image = pygame.image.load('sprites/background2.jpg')
 
 def main_screen(screen):
     global current_state
@@ -124,28 +125,29 @@ def play_game(screen):
 
 def render_description(screen):
     # Fill the screen with a different color
-    screen.fill(BLACK)
+    #screen.fill(BLACK)
+    screen.blit(background2_image, (0, 0))
     screen_width, screen_height = screen.get_size()
 
     #word_wrap(screen, "The purpose of this game is to teach you about open source tools that are critical to know for today's cloud focused environment.  The 2 tools focused on in this game are Docker and Kubernetes.  With a grasp of these tools, you will be primed for success when developing and deploying your application to the world", font, WHITE)
 
-    text, _ = font.render("The purpose of this game is to teach you about open source tools", WHITE)
+    text, _ = font.render("The purpose of this game is to teach you about open source tools", RED)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
 
-    text2, _ = font.render("that are critical to know for today's cloud focused environment.", WHITE)
+    text2, _ = font.render("that are critical to know for today's cloud focused environment.", RED)
     text2_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 40))
     screen.blit(text2, text2_rect)
 
-    text3, _ = font.render("The 2 tools focused on in this game are Docker and Kubernetes.", WHITE)
+    text3, _ = font.render("The 2 tools focused on in this game are Docker and Kubernetes.", RED)
     text3_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 80))
     screen.blit(text3, text3_rect)
 
-    text4, _ = font.render("With a grasp of these tools, you will be primed for success when", WHITE)
+    text4, _ = font.render("With a grasp of these tools, you will be primed for success when", RED)
     text4_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 120))
     screen.blit(text4, text4_rect)
 
-    text5, _ = font.render("developing and deploying your application to the world.", WHITE)
+    text5, _ = font.render("developing and deploying your application to the world.", RED)
     text5_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 160))
     screen.blit(text5, text5_rect)
 
@@ -160,11 +162,12 @@ def render_description(screen):
 
 def render_team(screen):
     # Fill the screen with a different color
-    screen.fill(BLACK)
+    #screen.fill(BLACK)
+    screen.blit(background2_image, (0, 0))
     screen_width, screen_height = screen.get_size()
 
     # Render content for the new screen 3
-    text, _ = font.render("Team: Zach Jacobson, Phong Duong, Om Patel, Shreiyas Saraf", WHITE)
+    text, _ = font.render("Team: Zach Jacobson, Phong Duong, Om Patel, Shreiyas Saraf", RED)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
 
@@ -179,11 +182,12 @@ def render_team(screen):
 
 def render_tutorial(screen):
     # Fill the screen with a different color
-    screen.fill(BLACK)
+    #screen.fill(BLACK)
+    screen.blit(background2_image, (0, 0))
     screen_width, screen_height = screen.get_size()
 
     # Render content for the new screen 4
-    text, _ = font.render("Use wasd to move the player's sprite. Use Enter to interact with characters", WHITE)
+    text, _ = font.render("Use wasd to move the player's sprite. Use Enter to interact with characters", RED)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
 
