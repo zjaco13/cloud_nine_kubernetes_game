@@ -14,6 +14,9 @@ TUTORIAL = 4
 # Initial game state
 current_state = MAIN_MENU
 
+# Load the image
+background_image = pygame.image.load('sprites/background.jpg')
+
 def main_screen(screen):
     global current_state
     
@@ -71,7 +74,8 @@ def main_screen(screen):
 
 def render_main_menu(screen):
     # Fill the screen with white color
-    screen.fill(WHITE)
+    #screen.fill(WHITE)
+    screen.blit(background_image, (0, 0))
     screen_width, screen_height = screen.get_size()
 
     # Render title of the game on the screen
