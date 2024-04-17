@@ -1,7 +1,7 @@
 import pygame
 import sys
 import pygame.freetype
-from util.util import word_wrap, WHITE, GRAY, BLACK, font
+from util.util import word_wrap, WHITE, GRAY, BLACK, RED, font
 from screens.ship_screen import ship_screen
 
 # Define game states
@@ -79,7 +79,7 @@ def render_main_menu(screen):
     screen_width, screen_height = screen.get_size()
 
     # Render title of the game on the screen
-    font.render_to(screen, (screen_width // 2 - 200, screen_height // 2 - 50), "Kubernetes Pirate Adventure", BLACK)
+    font.render_to(screen, (screen_width // 2 - 200, screen_height // 2 - 50), "Kubernetes Pirate Adventure", RED)
 
 
     # Draw play button 1 - PLAY
@@ -125,9 +125,29 @@ def play_game(screen):
 def render_description(screen):
     # Fill the screen with a different color
     screen.fill(BLACK)
+    screen_width, screen_height = screen.get_size()
 
+    #word_wrap(screen, "The purpose of this game is to teach you about open source tools that are critical to know for today's cloud focused environment.  The 2 tools focused on in this game are Docker and Kubernetes.  With a grasp of these tools, you will be primed for success when developing and deploying your application to the world", font, WHITE)
 
-    word_wrap(screen, "The purpose of this game is to teach you about open source tools that are critical to know for todays cloud focused environment.  The 2 tools focused on in this game are Docker and Kubernetes.  With a grasp of these tools, you will be primed for success when developing and deploying your application to the world", font, WHITE)
+    text, _ = font.render("The purpose of this game is to teach you about open source tools", WHITE)
+    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
+    screen.blit(text, text_rect)
+
+    text2, _ = font.render("that are critical to know for today's cloud focused environment.", WHITE)
+    text2_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 40))
+    screen.blit(text2, text2_rect)
+
+    text3, _ = font.render("The 2 tools focused on in this game are Docker and Kubernetes.", WHITE)
+    text3_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 80))
+    screen.blit(text3, text3_rect)
+
+    text4, _ = font.render("With a grasp of these tools, you will be primed for success when", WHITE)
+    text4_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 120))
+    screen.blit(text4, text4_rect)
+
+    text5, _ = font.render("developing and deploying your application to the world.", WHITE)
+    text5_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 160))
+    screen.blit(text5, text5_rect)
 
     # Render back button
     back_button = pygame.Rect(20, 20, 100, 50)
@@ -163,7 +183,7 @@ def render_tutorial(screen):
     screen_width, screen_height = screen.get_size()
 
     # Render content for the new screen 4
-    text, _ = font.render("Tutorial: Use wasd to move around your player and the ship. Use Enter to interact with characters", WHITE)
+    text, _ = font.render("Use wasd to move the player's sprite. Use Enter to interact with characters", WHITE)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
     screen.blit(text, text_rect)
 

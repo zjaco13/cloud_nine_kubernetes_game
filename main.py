@@ -6,7 +6,7 @@ from screens.main_screen import main_screen
 pygame.init()
 # Set up the screen
 screen_width = 1280 
-screen_height = 900 
+screen_height = 780 
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Kubernetes Pirate Adventure")
 
