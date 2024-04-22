@@ -1,41 +1,24 @@
-from docker.api.build import random
 import pygame
 import sys
-from util.util import word_wrap_with_box, WHITE, BLACK, font, OCEAN_BLUE, WIDTH, HEIGHT
+from util.util import word_wrap_with_box, WHITE, BLACK, font
 pygame.init()
 
-deployment_sections = [("apiVersion: apps/v1\nkind: Deployment", "tells kubernetes which version of the api to use and what type of object is getting created/updated/deleted by this file"),
-                       ("metadata:\n\tname: ai-demo", "gives a name to the deployment"),
-                       ("spec:\n\treplicas: 2", "How many pods of this app should be in the cluster at all times, controlled by the ReplicaSet"),
-                       ("\tselector:\n\t\tmatchLabels:\n\t\t\tapp: ai-demo", "tells the ReplicaSet which pods it should manage based on the app selected"),
-                       ("\ttemplate:\n\t\tmetadata:\n\t\t\tlabels:\n\t\t\t\tapp: ai-demo", "gives each pod a label so that it can be managed by the replicaset"),
-                       ("\t\tspec:\n\t\t\tcontainers:\n\t\t\t- name: ai-demo\n\t\t\t\timage: ai-demo\n\t\t\t\t\tports:\n\t\t\t\t\t- containerPort: 3000", "tells the pod which container to one, the name of it, the image it should use, and which ports it should expose")]
-
-dockerfile_sections = [("FROM python:3.11", "base image to pull from, normally use different language images as base"), 
-                       ("WORKDIR /app","set the working directory in the container"),
-                       ("COPY . /app", "copy app contents to the container working directory"),
-                       ("RUN pip install --no-cache-dir -r requirements.txt", "run instructions to build/install dependencies"),
-                       ("EXPOSE 3000", "Expose a port on a container if need to access externally"),
-                       ("CMD [\"python\", \"server.py\"]"), "run the command specified for cmd"]
-
-service_sections = [("apiVersion: v1\nkind: Service", "tells kubernetes which version of the api to use and which object will be created/updated/deleted by this file"),
-                    ("metadata:\n\tname: ai-demo", "gives a name to the service"),
-                    ("spec:\n\tselector:\n\t\tapp: ai-demo", "tells the service which pods are served traffic from this service"),
-                    ("\tports:\n\t\t- protocol: TCP\n\t\tport: 80\n\t\ttargetPort: 3000", "The port that will be exposed to the internet by this service,The port on the container to pass the traffic to"),
-                    ("\ttype: LoadBalancer", "The type of service (LoadBalancer - exposes to external load balancer handled by cloud provider - easiest option to setup, NodePort - exposed on a static port of the clusters ip address, ClusterIP - cluster internal only, ExternalName - maps service to some hostname and sets up DNS on the cluster for that name)")]
-
-
+kube_text = ["Kubernetes is a portable, extensible, open source platform for managing containerized workloads and services, that facilitates both declarative configuration and automation. It has a large, rapidly growing ecosystem. Kubernetes services, support, and tools are widely available.", "Kubernetes provides you with a framework to run distributed systems resiliently. It takes care of scaling and failover for your application, provides deployment patterns, and more.", "Kubernetes runs your workload by placing containers into Pods to run on Nodes. A node may be a virtual or physical machine, depending on the cluster. Each node is managed by the control plane and contains the services necessary to run Pods."]
+docker_text = [
+"Docker is an open platform for developing, shipping, and running applications. Docker enables you to separate your applications from your infrastructure so you can deliver software quickly. With Docker, you can manage your infrastructure in the same ways you manage your applications. By taking advantage of Docker's methodologies for shipping, testing, and deploying code, you can significantly reduce the delay between writing code and running it in production.", 
+"Docker provides the ability to package and run an application in a loosely isolated environment called a container. The isolation and security lets you run many containers simultaneously on a given host. Containers are lightweight and contain everything needed to run the application, so you don't need to rely on what's installed on the host. You can share containers while you work, and be sure that everyone you share with gets the same container that works in the same way.", "Docker's container-based platform allows for highly portable workloads. Docker containers can run on a developer's local laptop, on physical or virtual machines in a data center, on cloud providers, or in a mixture of environments. Docker's portability and lightweight nature also make it easy to dynamically manage workloads, scaling up or tearing down applications and services as business needs dictate, in near real time."]
+start_text = ["Set Sail? (Y/N)"]
 all_sprites = pygame.sprite.Group()
 players = pygame.sprite.Group()
-islands = pygame.sprite.Group()
+npcs = pygame.sprite.Group()
 
 # Define player class
-class Boat(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite):
     def __init__(self, screen_width, screen_height):
         super().__init__()
         self.image = pygame.Surface((50, 50))
         self.sprite = pygame.image.load('sprites/humanSprite.jpg')
-        self.sprite = pygame.transform.scale(self.sprite, (50, 50))
+        self.sprite = pygame.transform.scale(self.sprite, (50, 80))
         self.rect = self.image.get_rect()
         self.rect.center = (screen_width // 2, screen_height // 2)
         self.screen_height = screen_height
@@ -44,7 +27,6 @@ class Boat(pygame.sprite.Sprite):
         self.dy = 0
         self.frozen = False
         self.is_colliding = False
-        self.files = [File("Dockerfile"), File("deployment.yaml"), File("service.yaml")]
     def update(self, *args, **kwargs):
         key = pygame.key.get_pressed()
         self.dx = 0
@@ -61,7 +43,7 @@ class Boat(pygame.sprite.Sprite):
         if not self.frozen:
             self.rect.x += self.dx
             self.rect.y += self.dy
-        collisions = pygame.sprite.spritecollide(self, islands, False)
+        collisions = pygame.sprite.spritecollide(self, npcs, False)
         if collisions:
             self.is_colliding = True
 
@@ -72,19 +54,19 @@ class Boat(pygame.sprite.Sprite):
 
 
 # Define NPC class
-class Island(pygame.sprite.Sprite):
+class NPC(pygame.sprite.Sprite):
     def __init__(self, x, y, text, image):
         super().__init__()
-        self.image = pygame.Surface((30, 30))
+        self.image = pygame.Surface((50, 80))
         self.sprite = pygame.image.load(image)
-        self.sprite = pygame.transform.scale(self.sprite, (30, 30))
+        self.sprite = pygame.transform.scale(self.sprite, (50, 80))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.is_colliding = False
-        self.text = text[0]
-        self.description = text[1]
+        self.col = 0 
+        self.text = text
+        self.last_keypress = 0
         self.spoken = False
-        self.input = ""
     def update(self, *args, **kwargs) -> None:
         screen = None
         if len(args) > 0:
@@ -102,40 +84,30 @@ class Island(pygame.sprite.Sprite):
                 self.is_colliding = True
                 player = p
         if self.is_colliding:
-            while True:
-                word_wrap_with_box(screen, self.text, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 250)),starty = HEIGHT-250, size=20)
-                word_wrap_with_box(screen, "Copy this text to your file:\n" + self.input, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 250)), startx = WIDTH//2, starty = HEIGHT - 250, size=20)
-                word_wrap_with_box(screen, self.description, font, BLACK, box_surface=pygame.Surface((WIDTH, 250)),size=20)
-                pygame.display.flip()
-                if self.input == self.text:
-                    break
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_BACKSPACE:
-                            self.input = self.input[:-1]
-                        elif event.key >= 32 and event.key <= 126:  # Only handle printable ASCII characters
-                            self.input += event.unicode
-                        elif event.key == pygame.K_RETURN:
-                            self.input += "\n"
-                        elif event.key == pygame.K_TAB:
-                            self.input += "\t"
-            pygame.time.delay(1000)
-            player.frozen = False
-            self.is_colliding = False
-            player.is_colliding = False
-            self.spoken = True
+            if pygame.key.get_pressed()[pygame.K_RETURN]:
+                curr_keypress = pygame.time.get_ticks()
+                if curr_keypress - self.last_keypress > 500:
+                    self.col += 1
+                    self.last_keypress = curr_keypress
+            if self.col < len(self.text):
+                word_wrap_with_box(screen, self.text[self.col], font, BLACK, size=20)
+            else:
+                player.frozen = False
+                self.is_colliding = False
+                player.is_colliding = False
+                self.spoken = True
 
-class File(pygame.sprite.Sprite):
-    def __init__(self, name):
+class Helm_NPC(pygame.sprite.Sprite):
+    def __init__(self, x, y, text):
         super().__init__()
         self.image = pygame.Surface((50, 80))
         self.sprite = pygame.image.load('sprites/helmNPC.jpg')
         self.sprite = pygame.transform.scale(self.sprite, (50, 80))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
         self.is_colliding = False
         self.col = 0 
+        self.text = text
         self.spoken_y = False
         self.spoken_n = False
     def update(self, *args, **kwargs) -> None:
@@ -144,73 +116,88 @@ class File(pygame.sprite.Sprite):
             screen = args[0]
         else:
             raise ValueError("Missing Screen argument")
-
-def circles_collide(circle1, circle2, min_distance):
-    distance_squared = (circle1[0] - circle2[0]) ** 2 + (circle1[1] - circle2[1]) ** 2
-    min_distance_squared = min_distance ** 2
-    return distance_squared < min_distance_squared
-def generate_island_positions(num_islands, min_distance):
-    island_positions = []
-    for _ in range(num_islands):
-        valid_position = False
-        while not valid_position:
-            x = random.randint(0, WIDTH)
-            y = random.randint(0, HEIGHT)
-            valid_position = True
-            for island_pos in island_positions:
-                if circles_collide((x, y), island_pos, min_distance) or (x in range(WIDTH//2-50, WIDTH//2+50) and y in range(HEIGHT//2-50 ,HEIGHT//2+50)):
-                    valid_position = False
-                    break
-        island_positions.append((x, y))
-    return island_positions
+        collisions = pygame.sprite.spritecollide(self, players, False)
+        player = None
+        if not collisions and self.spoken_n:
+            self.spoken_n = False 
+            self.col = 0
+            
+        for p in collisions:
+            if self.spoken_y or self.spoken_n:
+                p.rect.x -= p.dx
+                p.rect.y -= p.dy
+            else:
+                p.frozen = True
+                self.is_colliding = True
+                player = p
+        if self.is_colliding:
+            if pygame.key.get_pressed()[pygame.K_y]:
+                self.spoken_y = True
+                self.col += 1
+            if pygame.key.get_pressed()[pygame.K_n]:
+                self.col += 1
+                self.spoken_n = True
+            if self.col < len(self.text):
+                word_wrap_with_box(screen, self.text[self.col], font, BLACK)
+            else:
+                player.frozen = False
+                self.is_colliding = False
+                player.is_colliding = False
 
 def island_screen(screen):
+    screen_width, screen_height = screen.get_size()
     # Create player and NPC objects
     
-    player = Boat(WIDTH, HEIGHT)
+    player = Player(screen_width, screen_height)
     all_sprites.add(player)
     players.add(player)
+    kube_text = ["k1", "k2", "k3"]
+    docker_text = ["d1", "d2", "d3"]
+    start_text = ["Set Sail? (Y/N)"]
     
-
-    docker_idx = 0
-    deploy_idx = 0
-    service_idx = 0
-    indices = [docker_idx, deploy_idx, service_idx]
-    sections = [dockerfile_sections, deployment_sections, service_sections]
-    island_positions = generate_island_positions(len(dockerfile_sections) + len(deployment_sections) + len(service_sections), 100)
-    pos_idx = 0
-    while any(idx < len(lst) for idx, lst in zip(indices, sections)):
-        x,y = island_positions[pos_idx]
-        island = None
-        idx = random.randint(0,2)
-        if indices[idx] < len(sections[idx]):
-            island = Island(x,y, sections[idx][indices[idx]], 'sprites/islandSpriteNeedCrop.jpg')
-            indices[idx] += 1
-            pos_idx += 1
-        if island:
-            all_sprites.add(island)
-            islands.add(island)
-    print(len(islands.sprites()))
+    kube_npc = NPC(300, 800, kube_text, 'sprites/KuberNPC.jpg')
+    docker_npc = NPC(700, 200,docker_text, 'sprites/dockerSprite.jpg')
+    start_npc = Helm_NPC(200,450, start_text)
+      # Adjust position as needed
+    all_sprites.add(kube_npc, docker_npc, start_npc)
+    npcs.add(kube_npc, docker_npc, start_npc)
     
     # Font for rendering text
+    font_input = pygame.font.Font(None, 32)
     
     # Main loop
     running = True
+    user_input = ""
     while running:
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    print("User input:", user_input)
+                    user_input = ""
+                elif event.key == pygame.K_BACKSPACE:
+                    user_input = user_input[:-1]
+                elif event.key >= 32 and event.key <= 126:  # Only handle printable ASCII characters
+                    user_input += event.unicode
     
-        screen.fill(OCEAN_BLUE)
+        screen.fill(WHITE)
         # Update
         all_sprites.update(screen)
     
         # Draw
         all_sprites.draw(screen)
         screen.blit(player.sprite, player.rect)
-        for island in islands.sprites():
-            screen.blit(island.sprite, island.rect)
+        screen.blit(kube_npc.sprite, kube_npc.rect)
+        screen.blit(start_npc.sprite, start_npc.rect)
+        screen.blit(docker_npc.sprite, docker_npc.rect)
+    
+        # Render user input text
+        input_text_surface = font_input.render(user_input, True, BLACK)
+        screen.blit(input_text_surface, (20, 20))
     
         # Refresh the display
         pygame.display.flip()
