@@ -175,8 +175,10 @@ def render_team(screen):
     screen_width, screen_height = screen.get_size()
 
     # Render content for the new screen 3
-    text, _ = font.render("Team: Zach Jacobson, Phong Duong, Om Patel, Shreiyas Saraf", RED)
+    text, _ = font.render("Team: Zach Jacobson, Phong Duong, Om Patel, Shreiyas Saraf", BLACK)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
+    text_box_rect = text_rect.inflate(10, 10)
+    pygame.draw.rect(screen, WHITE, text_box_rect)
     screen.blit(text, text_rect)
 
     # Render back button
