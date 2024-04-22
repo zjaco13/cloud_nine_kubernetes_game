@@ -1,6 +1,6 @@
 import pygame
 import sys
-from util.util import word_wrap_with_box, font, WHITE, RED, BLACK, BLUE, OCEAN_BLUE, BROWN
+from util.util import HEIGHT, WIDTH, word_wrap_with_box, font, WHITE, RED, BLACK, BLUE, OCEAN_BLUE, BROWN
 from screens.island_screen import island_screen
 
 pygame.init()
@@ -145,9 +145,8 @@ class Helm_NPC(pygame.sprite.Sprite):
                 player.is_colliding = False
 
 def ship_screen(screen):
-    screen_width, screen_height = screen.get_size()
-    boat_x = (screen_width - boat_width) // 2
-    boat_y = (screen_height - boat_height) // 2
+    boat_x = (WIDTH - boat_width) // 2
+    boat_y = (HEIGHT - boat_height) // 2
     boat_rect = pygame.Rect(boat_x, boat_y, boat_width, boat_height)
     # Create player and NPC objects
     player = Player(boat_rect)
