@@ -79,7 +79,8 @@ class Island(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.is_colliding = False
-        self.text = text
+        self.text = text[0]
+        self.description = text[1]
         self.spoken = False
         self.input = ""
     def update(self, *args, **kwargs) -> None:
@@ -88,6 +89,7 @@ class Island(pygame.sprite.Sprite):
             screen = args[0]
         else:
             raise ValueError("Missing Screen argument")
+        width, height = screen.get_size()
         collisions = pygame.sprite.spritecollide(self, players, False)
         player = None
         for p in collisions:
@@ -100,7 +102,9 @@ class Island(pygame.sprite.Sprite):
                 player = p
         if self.is_colliding:
             while True:
-                word_wrap_with_box(screen, self.text + "\n\n" + self.input, font, BLACK, size=20)
+                word_wrap_with_box(screen, self.text, font, BLACK, box_surface=pygame.Surface((width // 2, height - 250)),starty = height-250, size=20)
+                word_wrap_with_box(screen, "Copy this text to your file:\n" + self.input, font, BLACK, box_surface=pygame.Surface((width // 2, height - 250)), startx = width//2, starty = height - 250, size=20)
+                word_wrap_with_box(screen, self.description, font, BLACK, box_surface=pygame.Surface((width, 250)),size=20)
                 pygame.display.flip()
                 if self.input == self.text:
                     break
@@ -149,9 +153,9 @@ def island_screen(screen):
     players.add(player)
     
 
-    kube_npc = Island(300, 800, deployment_sections[0][0], 'sprites/KuberNPC.jpg')
-    docker_npc = Island(700, 200,dockerfile_sections[1][0], 'sprites/dockerSprite.jpg')
-    start_npc = Island(200,450, dockerfile_sections[2][0], 'sprites/dockerSprite.jpg')
+    kube_npc = Island(300, 800, deployment_sections[0], 'sprites/KuberNPC.jpg')
+    docker_npc = Island(700, 200,dockerfile_sections[1], 'sprites/dockerSprite.jpg')
+    start_npc = Island(200,450, dockerfile_sections[2], 'sprites/dockerSprite.jpg')
       # Adjust position as needed
     all_sprites.add(kube_npc, docker_npc, start_npc)
     islands.add(kube_npc, docker_npc, start_npc)

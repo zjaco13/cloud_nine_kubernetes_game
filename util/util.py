@@ -14,28 +14,36 @@ BLUE = (0,0, 255)
 BROWN = (139, 69, 19)
 OCEAN_BLUE = (25, 25, 112)
 
-def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_color=(205, 133, 63), size=30):
+def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_surface = pygame.Surface((1280, 150)), box_color=(205, 133, 63), startx = 0, starty = 900, size=30):
     font.origin = True
-   # words = text.split(' ')
-    width, height = surf.get_size()
+    # words = text.split(' ')
+    width = min(surf.get_size()[0], box_surface.get_size()[0])
     line_spacing = font.get_sized_height(size) + 2
     space = font.get_rect(' ', size=size)
 
     words = []
+    word = ""
     for char in text:
         if char == "\n":
+            words.append(word)
+            word = ""
             words.append("\n")
         elif char == "\t":
+            words.append(word)
+            word = ""
             words.append("\t")
+        elif char == " ":
+            words.append(word)
+            word = ""
         else:
-            words.append(char)   
+            word += char
+    words.append(word)
     
 
     # Create bounding box surface
-    box_surface = pygame.Surface((width,  line_spacing*5+20))
     box_surface.fill(box_color)
     box_rect = box_surface.get_rect()
-    box_rect.bottomleft = (0, height)
+    box_rect.bottomleft = (startx, starty)
 
     # Render text onto the box surface
     x, y = 10, 0
