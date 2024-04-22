@@ -1,28 +1,29 @@
 from docker.api.build import random
+import difflib
 import pygame
 import sys
-from util.util import word_wrap_with_box, WHITE, BLACK, font, OCEAN_BLUE, WIDTH, HEIGHT
+from util.util import word_wrap, word_wrap_with_box, WHITE, BLACK, font, OCEAN_BLUE, WIDTH, HEIGHT, RED
 pygame.init()
 
 deployment_sections = [("apiVersion: apps/v1\nkind: Deployment", "tells kubernetes which version of the api to use and what type of object is getting created/updated/deleted by this file"),
                        ("metadata:\n\tname: ai-demo", "gives a name to the deployment"),
                        ("spec:\n\treplicas: 2", "How many pods of this app should be in the cluster at all times, controlled by the ReplicaSet"),
-                       ("\tselector:\n\t\tmatchLabels:\n\t\t\tapp: ai-demo", "tells the ReplicaSet which pods it should manage based on the app selected"),
-                       ("\ttemplate:\n\t\tmetadata:\n\t\t\tlabels:\n\t\t\t\tapp: ai-demo", "gives each pod a label so that it can be managed by the replicaset"),
-                       ("\t\tspec:\n\t\t\tcontainers:\n\t\t\t- name: ai-demo\n\t\t\t\timage: ai-demo\n\t\t\t\t\tports:\n\t\t\t\t\t- containerPort: 3000", "tells the pod which container to one, the name of it, the image it should use, and which ports it should expose")]
+                       ("selector:\n\tmatchLabels:\n\t\tapp: ai-demo", "tells the ReplicaSet which pods it should manage based on the app selected"),
+                       ("template:\n\tmetadata:\n\t\tlabels:\n\t\t\tapp: ai-demo", "gives each pod a label so that it can be managed by the replicaset"),
+                       ("spec:\n\tcontainers:\n\t- name: ai-demo\n\t\timage: ai-demo\n\t\t\tports:\n\t\t\t- containerPort: 3000", "tells the pod which container to one, the name of it, the image it should use, and which ports it should expose")]
 
 dockerfile_sections = [("FROM python:3.11", "base image to pull from, normally use different language images as base"), 
                        ("WORKDIR /app","set the working directory in the container"),
                        ("COPY . /app", "copy app contents to the container working directory"),
                        ("RUN pip install --no-cache-dir -r requirements.txt", "run instructions to build/install dependencies"),
                        ("EXPOSE 3000", "Expose a port on a container if need to access externally"),
-                       ("CMD [\"python\", \"server.py\"]"), "run the command specified for cmd"]
+                       ('CMD ["python", "server.py"]', "run the command specified for cmd")]
 
 service_sections = [("apiVersion: v1\nkind: Service", "tells kubernetes which version of the api to use and which object will be created/updated/deleted by this file"),
                     ("metadata:\n\tname: ai-demo", "gives a name to the service"),
                     ("spec:\n\tselector:\n\t\tapp: ai-demo", "tells the service which pods are served traffic from this service"),
-                    ("\tports:\n\t\t- protocol: TCP\n\t\tport: 80\n\t\ttargetPort: 3000", "The port that will be exposed to the internet by this service,The port on the container to pass the traffic to"),
-                    ("\ttype: LoadBalancer", "The type of service (LoadBalancer - exposes to external load balancer handled by cloud provider - easiest option to setup, NodePort - exposed on a static port of the clusters ip address, ClusterIP - cluster internal only, ExternalName - maps service to some hostname and sets up DNS on the cluster for that name)")]
+                    ("ports:\n\t- protocol: TCP\n\tport: 80\n\ttargetPort: 3000", "The port that will be exposed to the internet by this service,The port on the container to pass the traffic to"),
+                    ("type: LoadBalancer", "The type of service (LoadBalancer - exposes to external load balancer handled by cloud provider - easiest option to setup, NodePort - exposed on a static port of the clusters ip address, ClusterIP - cluster internal only, ExternalName - maps service to some hostname and sets up DNS on the cluster for that name)")]
 
 
 all_sprites = pygame.sprite.Group()
@@ -73,7 +74,7 @@ class Boat(pygame.sprite.Sprite):
 
 # Define NPC class
 class Island(pygame.sprite.Sprite):
-    def __init__(self, x, y, text, image):
+    def __init__(self, x, y, text, image, filename):
         super().__init__()
         self.image = pygame.Surface((30, 30))
         self.sprite = pygame.image.load(image)
@@ -83,6 +84,7 @@ class Island(pygame.sprite.Sprite):
         self.is_colliding = False
         self.text = text[0]
         self.description = text[1]
+        self.filename = filename
         self.spoken = False
         self.input = ""
     def update(self, *args, **kwargs) -> None:
@@ -103,9 +105,14 @@ class Island(pygame.sprite.Sprite):
                 player = p
         if self.is_colliding:
             while True:
-                word_wrap_with_box(screen, self.text, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 250)),starty = HEIGHT-250, size=20)
-                word_wrap_with_box(screen, "Copy this text to your file:\n" + self.input, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 250)), startx = WIDTH//2, starty = HEIGHT - 250, size=20)
-                word_wrap_with_box(screen, self.description, font, BLACK, box_surface=pygame.Surface((WIDTH, 250)),size=20)
+                word_wrap_with_box(screen, "\n" +self.text, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 310)),starty = HEIGHT-250, size=20)
+                text_surf, _ = word_wrap_with_box(screen, "Copy this text to your file:\n" + self.input, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 310)), startx = WIDTH//2, starty = HEIGHT - 250, size=20)
+                word_wrap_with_box(screen, "What this code does:\n" + self.description, font, BLACK, box_surface=pygame.Surface((WIDTH, 250)),size=20)
+                word_wrap_with_box(screen, self.filename, font, BLACK, size = 40, box_surface = pygame.Surface((WIDTH, 60)), starty=50)
+                if not self.input == self.text:
+                    output_list = [li for li in difflib.ndiff(self.text, self.input) if li[0] != ' ']
+                    print_list = "".join(map(str,output_list)).replace("-", "").replace("\t", "TAB")
+                    word_wrap_with_box(screen, "INCORRECT TEXT!\n" + print_list,  font, RED, size=20, box_surface=pygame.Surface((WIDTH //2, 250)), startx=WIDTH//2, starty=HEIGHT-250)
                 pygame.display.flip()
                 if self.input == self.text:
                     break
@@ -177,6 +184,7 @@ def island_screen(screen):
     service_idx = 0
     indices = [docker_idx, deploy_idx, service_idx]
     sections = [dockerfile_sections, deployment_sections, service_sections]
+    files = ["Dockerfile", "deployment.yaml", "service.yaml"]
     island_positions = generate_island_positions(len(dockerfile_sections) + len(deployment_sections) + len(service_sections), 100)
     pos_idx = 0
     while any(idx < len(lst) for idx, lst in zip(indices, sections)):
@@ -184,7 +192,7 @@ def island_screen(screen):
         island = None
         idx = random.randint(0,2)
         if indices[idx] < len(sections[idx]):
-            island = Island(x,y, sections[idx][indices[idx]], 'sprites/islandSpriteNeedCrop.jpg')
+            island = Island(x,y, sections[idx][indices[idx]], 'sprites/islandSpriteNeedCrop.jpg', files[idx])
             indices[idx] += 1
             pos_idx += 1
         if island:
