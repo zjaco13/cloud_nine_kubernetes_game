@@ -16,24 +16,20 @@ OCEAN_BLUE = (25, 25, 112)
 
 def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_color=(205, 133, 63), size=30):
     font.origin = True
-    words = text.split(' ')
+   # words = text.split(' ')
     width, height = surf.get_size()
     line_spacing = font.get_sized_height(size) + 2
     space = font.get_rect(' ', size=size)
+
+    words = []
+    for char in text:
+        if char == "\n":
+            words.append("\n")
+        elif char == "\t":
+            words.append("\t")
+        else:
+            words.append(char)   
     
-    # Calculate text size
-    text_width = 0
-    text_height = 0
-    for word in words:
-        bounds = font.get_rect(word, size=size)
-        text_width += bounds.width + space.width
-        if text_width > width:  # Adjust text width to fit within screen width
-            text_width = width
-            break
-        if text_height + line_spacing + bounds.height - bounds.y > height:  # Adjust text height to fit within screen height
-            text_height = height
-            break
-        text_height += line_spacing + bounds.height - bounds.y
 
     # Create bounding box surface
     box_surface = pygame.Surface((width,  line_spacing*5+20))
@@ -42,13 +38,19 @@ def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_color=(205, 133, 6
     box_rect.bottomleft = (0, height)
 
     # Render text onto the box surface
-    x, y = 0, 0
+    x, y = 10, 0
     for word in words:
-        bounds = font.get_rect(word, size=size)
-        if x + bounds.width + bounds.x >= width - 10:
-            x, y = 0, y + line_spacing
-        font.render_to(box_surface, (x + 10, y + line_spacing), None, color, size = size)
-        x += bounds.width + space.width
+        if word == "\n":
+            x = 10
+            y += line_spacing
+        elif word == "\t":
+            x += space.width * 2
+        else:
+            bounds = font.get_rect(word, size=size)
+            if x + bounds.width + bounds.x >= width - 10:
+                x, y = 0, y + line_spacing
+            font.render_to(box_surface, (x + 10, y + line_spacing), None, color, size = size)
+            x += bounds.width + space.width
 
     surf.blit(box_surface, box_rect)  # Blit the text surface onto the screen
     pygame.draw.rect(surf, (0, 0, 0), box_rect, 2)  # Draw the bounding box around the text

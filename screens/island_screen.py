@@ -99,15 +99,25 @@ class Island(pygame.sprite.Sprite):
                 self.is_colliding = True
                 player = p
         if self.is_colliding:
-            word_wrap_with_box(screen, self.text, font, BLACK, size=20)
-            print("here")
-            while self.input != self.text:
+            while True:
+                word_wrap_with_box(screen, self.text + "\n\n" + self.input, font, BLACK, size=20)
+                pygame.display.flip()
+                if self.input == self.text:
+                    break
                 for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_BACKSPACE:
                             self.input = self.input[:-1]
                         elif event.key >= 32 and event.key <= 126:  # Only handle printable ASCII characters
                             self.input += event.unicode
+                        elif event.key == pygame.K_RETURN:
+                            self.input += "\n"
+                        elif event.key == pygame.K_TAB:
+                            self.input += "\t"
+            pygame.time.delay(1000)
             player.frozen = False
             self.is_colliding = False
             player.is_colliding = False
@@ -138,7 +148,8 @@ def island_screen(screen):
     all_sprites.add(player)
     players.add(player)
     
-    kube_npc = Island(300, 800, dockerfile_sections[0][0], 'sprites/KuberNPC.jpg')
+
+    kube_npc = Island(300, 800, deployment_sections[0][0], 'sprites/KuberNPC.jpg')
     docker_npc = Island(700, 200,dockerfile_sections[1][0], 'sprites/dockerSprite.jpg')
     start_npc = Island(200,450, dockerfile_sections[2][0], 'sprites/dockerSprite.jpg')
       # Adjust position as needed
@@ -150,7 +161,6 @@ def island_screen(screen):
     
     # Main loop
     running = True
-    user_input = ""
     while running:
         # Handle events
         for event in pygame.event.get():
@@ -167,10 +177,6 @@ def island_screen(screen):
         screen.blit(kube_npc.sprite, kube_npc.rect)
         screen.blit(start_npc.sprite, start_npc.rect)
         screen.blit(docker_npc.sprite, docker_npc.rect)
-    
-        # Render user input text
-        input_text_surface = font_input.render(user_input, True, BLACK)
-        screen.blit(input_text_surface, (20, 20))
     
         # Refresh the display
         pygame.display.flip()
