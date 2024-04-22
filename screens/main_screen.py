@@ -80,7 +80,15 @@ def render_main_menu(screen):
     screen_width, screen_height = screen.get_size()
 
     # Render title of the game on the screen
-    font.render_to(screen, (screen_width // 2 - 200, screen_height // 2 - 50), "Kubernetes Pirate Adventure", RED)
+    #font.render_to(screen, (screen_width // 2 - 200, screen_height // 2 - 50), "Kubernetes Pirate Adventure", RED)
+
+    title_button = pygame.Rect(screen_width // 2 - 200, screen_height // 2 - 50, 450, 50)
+    pygame.draw.rect(screen, GRAY, title_button)
+    title_text,_ = font.render("Kubernetes Pirate Adventure", BLACK)
+    title_text_rect = title_text.get_rect(center=title_button.center)
+    screen.blit(title_text, title_text_rect)
+    global title_button_rect 
+    title_button_rect = title_button
 
 
     # Draw play button 1 - PLAY
