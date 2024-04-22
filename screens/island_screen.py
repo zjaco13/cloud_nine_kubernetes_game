@@ -1,6 +1,7 @@
+from docker.api.build import random
 import pygame
 import sys
-from util.util import word_wrap_with_box, WHITE, BLACK, font, OCEAN_BLUE
+from util.util import word_wrap_with_box, WHITE, BLACK, font, OCEAN_BLUE, WIDTH, HEIGHT
 pygame.init()
 
 deployment_sections = [("apiVersion: apps/v1\nkind: Deployment", "tells kubernetes which version of the api to use and what type of object is getting created/updated/deleted by this file"),
@@ -23,6 +24,7 @@ service_sections = [("apiVersion: v1\nkind: Service", "tells kubernetes which ve
                     ("\tports:\n\t\t- protocol: TCP\n\t\tport: 80\n\t\ttargetPort: 3000", "The port that will be exposed to the internet by this service,The port on the container to pass the traffic to"),
                     ("\ttype: LoadBalancer", "The type of service (LoadBalancer - exposes to external load balancer handled by cloud provider - easiest option to setup, NodePort - exposed on a static port of the clusters ip address, ClusterIP - cluster internal only, ExternalName - maps service to some hostname and sets up DNS on the cluster for that name)")]
 
+
 all_sprites = pygame.sprite.Group()
 players = pygame.sprite.Group()
 islands = pygame.sprite.Group()
@@ -33,7 +35,7 @@ class Boat(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.Surface((50, 50))
         self.sprite = pygame.image.load('sprites/humanSprite.jpg')
-        self.sprite = pygame.transform.scale(self.sprite, (50, 80))
+        self.sprite = pygame.transform.scale(self.sprite, (50, 50))
         self.rect = self.image.get_rect()
         self.rect.center = (screen_width // 2, screen_height // 2)
         self.screen_height = screen_height
@@ -73,9 +75,9 @@ class Boat(pygame.sprite.Sprite):
 class Island(pygame.sprite.Sprite):
     def __init__(self, x, y, text, image):
         super().__init__()
-        self.image = pygame.Surface((50, 80))
+        self.image = pygame.Surface((30, 30))
         self.sprite = pygame.image.load(image)
-        self.sprite = pygame.transform.scale(self.sprite, (50, 80))
+        self.sprite = pygame.transform.scale(self.sprite, (30, 30))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.is_colliding = False
@@ -89,7 +91,6 @@ class Island(pygame.sprite.Sprite):
             screen = args[0]
         else:
             raise ValueError("Missing Screen argument")
-        width, height = screen.get_size()
         collisions = pygame.sprite.spritecollide(self, players, False)
         player = None
         for p in collisions:
@@ -102,9 +103,9 @@ class Island(pygame.sprite.Sprite):
                 player = p
         if self.is_colliding:
             while True:
-                word_wrap_with_box(screen, self.text, font, BLACK, box_surface=pygame.Surface((width // 2, height - 250)),starty = height-250, size=20)
-                word_wrap_with_box(screen, "Copy this text to your file:\n" + self.input, font, BLACK, box_surface=pygame.Surface((width // 2, height - 250)), startx = width//2, starty = height - 250, size=20)
-                word_wrap_with_box(screen, self.description, font, BLACK, box_surface=pygame.Surface((width, 250)),size=20)
+                word_wrap_with_box(screen, self.text, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 250)),starty = HEIGHT-250, size=20)
+                word_wrap_with_box(screen, "Copy this text to your file:\n" + self.input, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 250)), startx = WIDTH//2, starty = HEIGHT - 250, size=20)
+                word_wrap_with_box(screen, self.description, font, BLACK, box_surface=pygame.Surface((WIDTH, 250)),size=20)
                 pygame.display.flip()
                 if self.input == self.text:
                     break
@@ -144,24 +145,54 @@ class File(pygame.sprite.Sprite):
         else:
             raise ValueError("Missing Screen argument")
 
+def circles_collide(circle1, circle2, min_distance):
+    distance_squared = (circle1[0] - circle2[0]) ** 2 + (circle1[1] - circle2[1]) ** 2
+    min_distance_squared = min_distance ** 2
+    return distance_squared < min_distance_squared
+def generate_island_positions(num_islands, min_distance):
+    island_positions = []
+    for _ in range(num_islands):
+        valid_position = False
+        while not valid_position:
+            x = random.randint(0, WIDTH)
+            y = random.randint(0, HEIGHT)
+            valid_position = True
+            for island_pos in island_positions:
+                if circles_collide((x, y), island_pos, min_distance) or (x in range(WIDTH//2-50, WIDTH//2+50) and y in range(HEIGHT//2-50 ,HEIGHT//2+50)):
+                    valid_position = False
+                    break
+        island_positions.append((x, y))
+    return island_positions
+
 def island_screen(screen):
-    screen_width, screen_height = screen.get_size()
     # Create player and NPC objects
     
-    player = Boat(screen_width, screen_height)
+    player = Boat(WIDTH, HEIGHT)
     all_sprites.add(player)
     players.add(player)
     
 
-    kube_npc = Island(300, 800, deployment_sections[0], 'sprites/KuberNPC.jpg')
-    docker_npc = Island(700, 200,dockerfile_sections[1], 'sprites/dockerSprite.jpg')
-    start_npc = Island(200,450, dockerfile_sections[2], 'sprites/dockerSprite.jpg')
-      # Adjust position as needed
-    all_sprites.add(kube_npc, docker_npc, start_npc)
-    islands.add(kube_npc, docker_npc, start_npc)
+    docker_idx = 0
+    deploy_idx = 0
+    service_idx = 0
+    indices = [docker_idx, deploy_idx, service_idx]
+    sections = [dockerfile_sections, deployment_sections, service_sections]
+    island_positions = generate_island_positions(len(dockerfile_sections) + len(deployment_sections) + len(service_sections), 100)
+    pos_idx = 0
+    while any(idx < len(lst) for idx, lst in zip(indices, sections)):
+        x,y = island_positions[pos_idx]
+        island = None
+        idx = random.randint(0,2)
+        if indices[idx] < len(sections[idx]):
+            island = Island(x,y, sections[idx][indices[idx]], 'sprites/islandSpriteNeedCrop.jpg')
+            indices[idx] += 1
+            pos_idx += 1
+        if island:
+            all_sprites.add(island)
+            islands.add(island)
+    print(len(islands.sprites()))
     
     # Font for rendering text
-    font_input = pygame.font.Font(None, 32)
     
     # Main loop
     running = True
@@ -178,9 +209,8 @@ def island_screen(screen):
         # Draw
         all_sprites.draw(screen)
         screen.blit(player.sprite, player.rect)
-        screen.blit(kube_npc.sprite, kube_npc.rect)
-        screen.blit(start_npc.sprite, start_npc.rect)
-        screen.blit(docker_npc.sprite, docker_npc.rect)
+        for island in islands.sprites():
+            screen.blit(island.sprite, island.rect)
     
         # Refresh the display
         pygame.display.flip()

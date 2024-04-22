@@ -5,6 +5,9 @@ pygame.init()
 
 
 font = pygame.freetype.Font('Minecraft.ttf', 30)
+WIDTH = 1280
+HEIGHT = 900
+
 # Set up colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -14,10 +17,10 @@ BLUE = (0,0, 255)
 BROWN = (139, 69, 19)
 OCEAN_BLUE = (25, 25, 112)
 
-def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_surface = pygame.Surface((1280, 150)), box_color=(205, 133, 63), startx = 0, starty = 900, size=30):
+def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_surface = pygame.Surface((1280, 150)), box_color=(205, 133, 63), startx = 0, starty = HEIGHT, size=30):
     font.origin = True
     # words = text.split(' ')
-    width = min(surf.get_size()[0], box_surface.get_size()[0])
+    width = min(WIDTH, box_surface.get_size()[0])
     line_spacing = font.get_sized_height(size) + 2
     space = font.get_rect(' ', size=size)
 
@@ -67,17 +70,16 @@ def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_surface = pygame.S
 def word_wrap(surf, text, font, color=(0, 0, 0), size = 30):
     font.origin = True
     words = text.split(' ')
-    width, height = surf.get_size()
     line_spacing = font.get_sized_height(size) + 2
     x, y = 0, surf.get_size()[1] - line_spacing*5
     space = font.get_rect(' ', size=size)
     for word in words:
         bounds = font.get_rect(word)
-        if x + bounds.width + bounds.x >= width:
+        if x + bounds.width + bounds.x >= WIDTH:
             x, y = 0, y + line_spacing
-        if x + bounds.width + bounds.x >= width:
+        if x + bounds.width + bounds.x >= WIDTH:
             raise ValueError("word too wide for the surface")
-        if y + bounds.height - bounds.y >= height:
+        if y + bounds.height - bounds.y >= HEIGHT:
             raise ValueError("text to long for the surface")
         font.render_to(surf, (x, y), None, color, size = size)
         x += bounds.width + space.width
