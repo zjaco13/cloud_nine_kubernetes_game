@@ -139,24 +139,34 @@ def render_description(screen):
 
     #word_wrap(screen, "The purpose of this game is to teach you about open source tools that are critical to know for today's cloud focused environment.  The 2 tools focused on in this game are Docker and Kubernetes.  With a grasp of these tools, you will be primed for success when developing and deploying your application to the world", font, WHITE)
 
-    text, _ = font.render("The purpose of this game is to teach you about open source tools", RED)
+    text, _ = font.render("The purpose of this game is to teach you about open source tools", BLACK)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
+    text_box_rect = text_rect.inflate(10, 10)
+    pygame.draw.rect(screen, WHITE, text_box_rect)
     screen.blit(text, text_rect)
 
-    text2, _ = font.render("that are critical to know for today's cloud focused environment.", RED)
+    text2, _ = font.render("that are critical to know for today's cloud focused environment.", BLACK)
     text2_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 40))
+    text2_box_rect = text2_rect.inflate(10, 10)
+    pygame.draw.rect(screen, WHITE, text2_box_rect)
     screen.blit(text2, text2_rect)
 
-    text3, _ = font.render("The 2 tools focused on in this game are Docker and Kubernetes.", RED)
+    text3, _ = font.render("The 2 tools focused on in this game are Docker and Kubernetes.", BLACK)
     text3_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 80))
+    text3_box_rect = text3_rect.inflate(10, 10)
+    pygame.draw.rect(screen, WHITE, text3_box_rect)
     screen.blit(text3, text3_rect)
 
-    text4, _ = font.render("With a grasp of these tools, you will be primed for success when", RED)
+    text4, _ = font.render("With a grasp of these tools, you will be primed for success when", BLACK)
     text4_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 120))
+    text4_box_rect = text4_rect.inflate(10, 10)
+    pygame.draw.rect(screen, WHITE, text4_box_rect)
     screen.blit(text4, text4_rect)
 
-    text5, _ = font.render("developing and deploying your application to the world.", RED)
+    text5, _ = font.render("developing and deploying your application to the world.", BLACK)
     text5_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 160))
+    text5_box_rect = text5_rect.inflate(10, 10)
+    pygame.draw.rect(screen, WHITE, text5_box_rect)
     screen.blit(text5, text5_rect)
 
     # Render back button
@@ -197,8 +207,10 @@ def render_tutorial(screen):
     screen_width, screen_height = screen.get_size()
 
     # Render content for the new screen 4
-    text, _ = font.render("Use wasd to move the player's sprite. Use Enter to interact with characters", RED)
+    text, _ = font.render("Use wasd to move the player's sprite. Use Enter to interact with characters", BLACK)
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
+    text_box_rect = text_rect.inflate(10, 10)
+    pygame.draw.rect(screen, WHITE, text_box_rect)
     screen.blit(text, text_rect)
 
     # Render back button
