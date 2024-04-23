@@ -13,7 +13,7 @@ deployment_sections = [("apiVersion: apps/v1\nkind: Deployment", "tells kubernet
                        ("spec:\n\tcontainers:\n\t- name: ai-demo\n\t\timage: ai-demo\n\t\t\tports:\n\t\t\t- containerPort: 3000", "tells the pod which container to one, the name of it, the image it should use, and which ports it should expose")]
 
 deployment_text = ["apiVersion: apps/v1\nkind: Deployment", "metadata:\n\tname: ai-demo" ,"spec:\n\treplicas: 2", "selector:\n\t\tmatchLabels:\n\t\t\tapp: ai-demo", "template:\n\t\tmetadata:\n\t\t\tlabels:\n\t\t\t\tapp: ai-demo", "spec:\n\t\t\tcontainers:\n\t\t\t- name: ai-demo\n\t\t\t\timage: ai-demo\n\t\t\t\t\tports:\n\t\t\t\t\t- containerPort: 3000"]
-deployment_description = ""
+deployment_description = "This YAML file creates a Deployment in kubernetes.  A Deployment describes the desired state of an application on the cluster, including the number of Pods to run and which container to be on each Pod."
 
 dockerfile_sections = [("FROM python:3.11", "base image to pull from, normally use different language images as base"), 
                        ("WORKDIR /app","set the working directory in the container"),
@@ -22,7 +22,7 @@ dockerfile_sections = [("FROM python:3.11", "base image to pull from, normally u
                        ("EXPOSE 3000", "Expose a port on a container if need to access externally"),
                        ('CMD ["python", "server.py"]', "run the command specified for cmd")]
 dockerfile_text = [text for text, _ in dockerfile_sections]
-dockerfile_description = ""
+dockerfile_description = "This Dockerfile outlines the steps docker will take to package an application into a container.  Each step in the file creates a new container and caches it, so that during repeated builds these caches can be used."
 
 service_sections = [("apiVersion: v1\nkind: Service", "tells kubernetes which version of the api to use and which object will be created/updated/deleted by this file"),
                     ("metadata:\n\tname: ai-demo", "gives a name to the service"),
@@ -30,7 +30,7 @@ service_sections = [("apiVersion: v1\nkind: Service", "tells kubernetes which ve
                     ("ports:\n\t- protocol: TCP\n\t\tport: 80\n\t\ttargetPort: 3000", "The port that will be exposed to the internet by this service,The port on the container to pass the traffic to"),
                     ("type: LoadBalancer", "The type of service (LoadBalancer - exposes to external load balancer handled by cloud provider - easiest option to setup, NodePort - exposed on a static port of the clusters ip address, ClusterIP - cluster internal only, ExternalName - maps service to some hostname and sets up DNS on the cluster for that name)")]
 service_text = ["apiVersion: v1\nkind: Service", "metadata:\n\tname: ai-demo", "spec:\n\tselector:\n\t\tapp: ai-demo", "ports:\n\t\t- protocol: TCP\n\t\t\tport: 80\n\t\t\ttargetPort: 3000", "type: LoadBalancer"]
-service_description = ""
+service_description = "This YAML files creates a Service in kubernetes.  A Service allows a group of Pods on the network, which allows an application to recieve and send internet traffic."
 
 islandSprites =['sprites/island1.png', 'sprites/island2.png', 'sprites/island3.png', 'sprites/island4.png', 'sprites/island5.png', 'sprites/island6.png', 'sprites/island7.png', 'sprites/island8.png',
                 'sprites/island9.png', 'sprites/island10.png', 'sprites/island11.png', 'sprites/island12.png', 'sprites/island13.png', 'sprites/island14.png', 'sprites/island15.png', 'sprites/island16.png',
