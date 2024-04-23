@@ -110,6 +110,7 @@ class Helm_NPC(pygame.sprite.Sprite):
         self.text = text
         self.spoken_y = False
         self.spoken_n = False
+        self.can_speak = False
     def update(self, *args, **kwargs) -> None:
         screen = None
         if len(args) > 0:
@@ -123,7 +124,7 @@ class Helm_NPC(pygame.sprite.Sprite):
             self.col = 0
             
         for p in collisions:
-            if self.spoken_y or self.spoken_n:
+            if self.spoken_y or self.spoken_n or not self.can_speak:
                 p.rect.x -= p.dx
                 p.rect.y -= p.dy
             else:
@@ -174,6 +175,9 @@ def ship_screen(screen):
     
         if start_npc.spoken_y:
             island_screen(screen)
+        if kube_npc.spoken and docker_npc.spoken:
+            start_npc.can_speak = True
+
             
         # Draw
         all_sprites.draw(screen)

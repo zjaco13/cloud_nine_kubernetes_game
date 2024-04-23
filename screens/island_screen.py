@@ -223,6 +223,10 @@ def island_screen(screen):
     running = True
     while running:
         # Handle events
+        if all(file.done() for file in player.files):
+            # goto win screen or screen 4
+            running = False
+            
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
