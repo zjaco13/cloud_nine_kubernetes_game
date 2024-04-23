@@ -12,18 +12,25 @@ deployment_sections = [("apiVersion: apps/v1\nkind: Deployment", "tells kubernet
                        ("template:\n\tmetadata:\n\t\tlabels:\n\t\t\tapp: ai-demo", "gives each pod a label so that it can be managed by the replicaset"),
                        ("spec:\n\tcontainers:\n\t- name: ai-demo\n\t\timage: ai-demo\n\t\t\tports:\n\t\t\t- containerPort: 3000", "tells the pod which container to one, the name of it, the image it should use, and which ports it should expose")]
 
+deployment_text = ["apiVersion: apps/v1\nkind: Deployment", "metadata:\n\tname: ai-demo" ,"spec:\n\treplicas: 2", "\tselector:\n\t\tmatchLabels:\n\t\t\tapp: ai-demo", "\ttemplate:\n\t\tmetadata:\n\t\t\tlabels:\n\t\t\t\tapp: ai-demo", "\t\tspec:\n\t\t\tcontainers:\n\t\t\t- name: ai-demo\n\t\t\t\timage: ai-demo\n\t\t\t\t\tports:\n\t\t\t\t\t- containerPort: 3000"]
+deployment_description = ""
+
 dockerfile_sections = [("FROM python:3.11", "base image to pull from, normally use different language images as base"), 
                        ("WORKDIR /app","set the working directory in the container"),
                        ("COPY . /app", "copy app contents to the container working directory"),
                        ("RUN pip install --no-cache-dir -r requirements.txt", "run instructions to build/install dependencies"),
                        ("EXPOSE 3000", "Expose a port on a container if need to access externally"),
                        ('CMD ["python", "server.py"]', "run the command specified for cmd")]
+dockerfile_text = [text for text, _ in dockerfile_sections]
+dockerfile_description = ""
 
 service_sections = [("apiVersion: v1\nkind: Service", "tells kubernetes which version of the api to use and which object will be created/updated/deleted by this file"),
                     ("metadata:\n\tname: ai-demo", "gives a name to the service"),
                     ("spec:\n\tselector:\n\t\tapp: ai-demo", "tells the service which pods are served traffic from this service"),
-                    ("ports:\n\t- protocol: TCP\n\tport: 80\n\ttargetPort: 3000", "The port that will be exposed to the internet by this service,The port on the container to pass the traffic to"),
+                    ("ports:\n\t- protocol: TCP\n\t\tport: 80\n\t\ttargetPort: 3000", "The port that will be exposed to the internet by this service,The port on the container to pass the traffic to"),
                     ("type: LoadBalancer", "The type of service (LoadBalancer - exposes to external load balancer handled by cloud provider - easiest option to setup, NodePort - exposed on a static port of the clusters ip address, ClusterIP - cluster internal only, ExternalName - maps service to some hostname and sets up DNS on the cluster for that name)")]
+service_text = ["apiVersion: v1\nkind: Service", "metadata:\n\tname: ai-demo", "spec:\n\tselector:\n\t\tapp: ai-demo", "\tports:\n\t\t- protocol: TCP\n\t\t\tport: 80\n\t\t\ttargetPort: 3000", "\ttype: LoadBalancer"]
+service_description = ""
 
 
 all_sprites = pygame.sprite.Group()
@@ -45,7 +52,7 @@ class Boat(pygame.sprite.Sprite):
         self.dy = 0
         self.frozen = False
         self.is_colliding = False
-        self.files = [File("Dockerfile"), File("deployment.yaml"), File("service.yaml")]
+        self.files = [File("Dockerfile", dockerfile_text, dockerfile_sections, dockerfile_description), File("deployment.yaml", deployment_text, deployment_sections, deployment_description), File("service.yaml", service_text, service_sections, service_description)]
     def update(self, *args, **kwargs):
         key = pygame.key.get_pressed()
         self.dx = 0
@@ -106,9 +113,9 @@ class Island(pygame.sprite.Sprite):
         if self.is_colliding:
             while True:
                 word_wrap_with_box(screen, "\n" +self.text, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 310)),starty = HEIGHT-250, size=20)
-                text_surf, _ = word_wrap_with_box(screen, "Copy this text to your file:\n" + self.input, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 310)), startx = WIDTH//2, starty = HEIGHT - 250, size=20)
+                word_wrap_with_box(screen, "Copy this text to your file:\n" + self.input, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 310)), startx = WIDTH//2, starty = HEIGHT - 250, size=20)
                 word_wrap_with_box(screen, "What this code does:\n" + self.description, font, BLACK, box_surface=pygame.Surface((WIDTH, 250)),size=20)
-                word_wrap_with_box(screen, self.filename, font, BLACK, size = 40, box_surface = pygame.Surface((WIDTH, 60)), starty=50)
+                word_wrap_with_box(screen, self.filename, font, BLACK, size = 40, box_surface = pygame.Surface((WIDTH, 60)), starty=60)
                 if not self.input == self.text:
                     output_list = [li for li in difflib.ndiff(self.text, self.input) if li[0] != ' ']
                     print_list = "".join(map(str,output_list)).replace("-", "").replace("\t", "TAB")
@@ -129,28 +136,35 @@ class Island(pygame.sprite.Sprite):
                             self.input += "\n"
                         elif event.key == pygame.K_TAB:
                             self.input += "\t"
+
+            for file in player.files:
+                if file.name == self.filename:
+                    file.find_section(self.text)
             pygame.time.delay(1000)
             player.frozen = False
             self.is_colliding = False
             player.is_colliding = False
             self.spoken = True
 
-class File(pygame.sprite.Sprite):
-    def __init__(self, name):
-        super().__init__()
-        self.image = pygame.Surface((50, 80))
-        self.sprite = pygame.image.load('sprites/helmNPC.jpg')
-        self.sprite = pygame.transform.scale(self.sprite, (50, 80))
-        self.is_colliding = False
-        self.col = 0 
-        self.spoken_y = False
-        self.spoken_n = False
-    def update(self, *args, **kwargs) -> None:
-        screen = None
-        if len(args) > 0:
-            screen = args[0]
-        else:
-            raise ValueError("Missing Screen argument")
+class File():
+    def __init__(self, name, text, sections, description):
+        self.sections = [(0, input) for input, _ in sections]
+        self.text = text
+        self.name = name
+        self.description = description
+    def get_text(self):
+        ret_text = ""
+        for (found, section), text  in zip(self.sections, self.text):
+            if found == 0:
+                ret_text += "\n"* len(section.split("\n"))
+            elif found == 1:
+                ret_text += text + "\n"
+        return ret_text
+    def find_section(self, section):
+        for i in range(len(self.sections)):
+            if section == self.sections[i][1]:
+                self.sections[i] = (1, self.sections[i][1])
+        
 
 def circles_collide(circle1, circle2, min_distance):
     distance_squared = (circle1[0] - circle2[0]) ** 2 + (circle1[1] - circle2[1]) ** 2
@@ -209,6 +223,24 @@ def island_screen(screen):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_f:
+                show_file = True
+                while show_file:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            running = False
+                            show_file = False 
+                        elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                            show_file = False 
+                    x = 0
+                    for file in player.files:
+                        word_wrap_with_box(screen, file.name, font, BLACK, size = 40, box_surface= pygame.Surface((WIDTH // 3, 60)), startx = x, starty = 60)
+                        word_wrap_with_box(screen, file.get_text(), font, BLACK, size = 20, box_surface = pygame.Surface((WIDTH//3, HEIGHT-210)), startx = x, starty = HEIGHT-150)
+                        word_wrap_with_box(screen, "Description:\n" + file.description, font, BLACK, size = 20, box_surface=pygame.Surface((WIDTH//3, 150)), startx = x)
+                        x += WIDTH//3
+                    pygame.display.flip()
+                    
+
     
         screen.fill(OCEAN_BLUE)
         # Update
