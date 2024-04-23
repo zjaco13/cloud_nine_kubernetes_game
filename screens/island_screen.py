@@ -192,8 +192,8 @@ def generate_island_positions(num_islands, min_distance):
         island_positions.append((x, y))
     return island_positions
 def to_final_ship(screen):
-    from screens.final_ship_screen import to_end_screen 
-    to_end_screen(screen)
+    from screens.final_ship_screen import final_ship_screen 
+    final_ship_screen(screen)
 
 def island_screen(screen):
     # Create player and NPC objects

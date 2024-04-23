@@ -6,10 +6,10 @@ pygame.init()
 
 boat_width = 1100
 boat_height = 650 
-kube_text = []
-docker_text = []
-start_text = []
-instructor_text = []
+kube_text = ["ls"]
+docker_text = ["ls"]
+start_text = ["ls"]
+instructor_text = ["ls"]
 all_sprites = pygame.sprite.Group()
 players = pygame.sprite.Group()
 npcs = pygame.sprite.Group()
