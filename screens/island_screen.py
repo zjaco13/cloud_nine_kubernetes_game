@@ -2,6 +2,7 @@ from docker.api.build import random
 import difflib
 import pygame
 import sys
+from screens.game_over import game_over_screen
 from util.util import word_wrap, word_wrap_with_box, WHITE, BLACK, font, OCEAN_BLUE, WIDTH, HEIGHT, RED
 pygame.init()
 
@@ -224,8 +225,8 @@ def island_screen(screen):
     while running:
         # Handle events
         if all(file.done() for file in player.files):
+            game_over_screen(screen)
             # goto win screen or screen 4
-            running = False
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
