@@ -12,7 +12,7 @@ deployment_sections = [("apiVersion: apps/v1\nkind: Deployment", "tells kubernet
                        ("template:\n\tmetadata:\n\t\tlabels:\n\t\t\tapp: ai-demo", "gives each pod a label so that it can be managed by the replicaset"),
                        ("spec:\n\tcontainers:\n\t- name: ai-demo\n\t\timage: ai-demo\n\t\t\tports:\n\t\t\t- containerPort: 3000", "tells the pod which container to one, the name of it, the image it should use, and which ports it should expose")]
 
-deployment_text = ["apiVersion: apps/v1\nkind: Deployment", "metadata:\n\tname: ai-demo" ,"spec:\n\treplicas: 2", "\tselector:\n\t\tmatchLabels:\n\t\t\tapp: ai-demo", "\ttemplate:\n\t\tmetadata:\n\t\t\tlabels:\n\t\t\t\tapp: ai-demo", "\t\tspec:\n\t\t\tcontainers:\n\t\t\t- name: ai-demo\n\t\t\t\timage: ai-demo\n\t\t\t\t\tports:\n\t\t\t\t\t- containerPort: 3000"]
+deployment_text = ["apiVersion: apps/v1\nkind: Deployment", "metadata:\n\tname: ai-demo" ,"spec:\n\treplicas: 2", "selector:\n\t\tmatchLabels:\n\t\t\tapp: ai-demo", "template:\n\t\tmetadata:\n\t\t\tlabels:\n\t\t\t\tapp: ai-demo", "spec:\n\t\t\tcontainers:\n\t\t\t- name: ai-demo\n\t\t\t\timage: ai-demo\n\t\t\t\t\tports:\n\t\t\t\t\t- containerPort: 3000"]
 deployment_description = ""
 
 dockerfile_sections = [("FROM python:3.11", "base image to pull from, normally use different language images as base"), 
@@ -29,20 +29,24 @@ service_sections = [("apiVersion: v1\nkind: Service", "tells kubernetes which ve
                     ("spec:\n\tselector:\n\t\tapp: ai-demo", "tells the service which pods are served traffic from this service"),
                     ("ports:\n\t- protocol: TCP\n\t\tport: 80\n\t\ttargetPort: 3000", "The port that will be exposed to the internet by this service,The port on the container to pass the traffic to"),
                     ("type: LoadBalancer", "The type of service (LoadBalancer - exposes to external load balancer handled by cloud provider - easiest option to setup, NodePort - exposed on a static port of the clusters ip address, ClusterIP - cluster internal only, ExternalName - maps service to some hostname and sets up DNS on the cluster for that name)")]
-service_text = ["apiVersion: v1\nkind: Service", "metadata:\n\tname: ai-demo", "spec:\n\tselector:\n\t\tapp: ai-demo", "\tports:\n\t\t- protocol: TCP\n\t\t\tport: 80\n\t\t\ttargetPort: 3000", "\ttype: LoadBalancer"]
+service_text = ["apiVersion: v1\nkind: Service", "metadata:\n\tname: ai-demo", "spec:\n\tselector:\n\t\tapp: ai-demo", "ports:\n\t\t- protocol: TCP\n\t\t\tport: 80\n\t\t\ttargetPort: 3000", "type: LoadBalancer"]
 service_description = ""
 
+islandSprites =['sprites/island1.png', 'sprites/island2.png', 'sprites/island3.png', 'sprites/island4.png', 'sprites/island5.png', 'sprites/island6.png', 'sprites/island7.png', 'sprites/island8.png',
+                'sprites/island9.png', 'sprites/island10.png', 'sprites/island11.png', 'sprites/island12.png', 'sprites/island13.png', 'sprites/island14.png', 'sprites/island15.png', 'sprites/island16.png',
+                'sprites/island17.png', 'sprites/island18.png']
 
 all_sprites = pygame.sprite.Group()
 players = pygame.sprite.Group()
 islands = pygame.sprite.Group()
+oceanBackground = pygame.transform.scale(pygame.image.load('sprites/oceanBackground.jpg'), (WIDTH, HEIGHT))
 
 # Define player class
 class Boat(pygame.sprite.Sprite):
     def __init__(self, screen_width, screen_height):
         super().__init__()
         self.image = pygame.Surface((50, 50))
-        self.sprite = pygame.image.load('sprites/humanSprite.jpg')
+        self.sprite = pygame.image.load('sprites/shipSprite.png')
         self.sprite = pygame.transform.scale(self.sprite, (50, 50))
         self.rect = self.image.get_rect()
         self.rect.center = (screen_width // 2, screen_height // 2)
@@ -83,9 +87,9 @@ class Boat(pygame.sprite.Sprite):
 class Island(pygame.sprite.Sprite):
     def __init__(self, x, y, text, image, filename):
         super().__init__()
-        self.image = pygame.Surface((30, 30))
+        self.image = pygame.Surface((60, 60))
         self.sprite = pygame.image.load(image)
-        self.sprite = pygame.transform.scale(self.sprite, (30, 30))
+        self.sprite = pygame.transform.scale(self.sprite, (60, 60))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.is_colliding = False
@@ -212,7 +216,7 @@ def island_screen(screen):
         island = None
         idx = random.randint(0,2)
         if indices[idx] < len(sections[idx]):
-            island = Island(x,y, sections[idx][indices[idx]], 'sprites/islandSpriteNeedCrop.jpg', files[idx])
+            island = Island(x,y, sections[idx][indices[idx]], islandSprites[pos_idx], files[idx])
             indices[idx] += 1
             pos_idx += 1
         if island:
@@ -259,12 +263,13 @@ def island_screen(screen):
                     
 
     
-        screen.fill(OCEAN_BLUE)
+        #screen.fill(OCEAN_BLUE)
+        screen.blit(oceanBackground, (0, 0))
         # Update
         all_sprites.update(screen)
     
         # Draw
-        all_sprites.draw(screen)
+        #all_sprites.draw(screen)
         screen.blit(player.sprite, player.rect)
         for island in islands.sprites():
             screen.blit(island.sprite, island.rect)
