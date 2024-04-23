@@ -117,8 +117,8 @@ class Island(pygame.sprite.Sprite):
                 word_wrap_with_box(screen, "What this code does:\n" + self.description, font, BLACK, box_surface=pygame.Surface((WIDTH, 250)),size=20)
                 word_wrap_with_box(screen, self.filename, font, BLACK, size = 40, box_surface = pygame.Surface((WIDTH, 60)), starty=60)
                 if not self.input == self.text:
-                    output_list = [li for li in difflib.ndiff(self.text, self.input) if li[0] != ' ']
-                    print_list = "".join(map(str,output_list)).replace("-", "").replace("\t", "TAB")
+                    output_list = [li.replace("-", "", 1) for li in difflib.ndiff(self.text, self.input) if li[0] != ' ']
+                    print_list = "".join(map(str,output_list)).replace("\t", "TAB")
                     word_wrap_with_box(screen, "INCORRECT TEXT!\n" + print_list,  font, RED, size=20, box_surface=pygame.Surface((WIDTH //2, 250)), startx=WIDTH//2, starty=HEIGHT-250)
                 pygame.display.flip()
                 if self.input == self.text:
@@ -164,6 +164,9 @@ class File():
         for i in range(len(self.sections)):
             if section == self.sections[i][1]:
                 self.sections[i] = (1, self.sections[i][1])
+
+    def done(self):
+        return all(sec[0] == 1 for sec in self.sections)
         
 
 def circles_collide(circle1, circle2, min_distance):
@@ -237,6 +240,8 @@ def island_screen(screen):
                         word_wrap_with_box(screen, file.name, font, BLACK, size = 40, box_surface= pygame.Surface((WIDTH // 3, 60)), startx = x, starty = 60)
                         word_wrap_with_box(screen, file.get_text(), font, BLACK, size = 20, box_surface = pygame.Surface((WIDTH//3, HEIGHT-210)), startx = x, starty = HEIGHT-150)
                         word_wrap_with_box(screen, "Description:\n" + file.description, font, BLACK, size = 20, box_surface=pygame.Surface((WIDTH//3, 150)), startx = x)
+                        if file.done():
+                            word_wrap_with_box(screen, "FILE COMPLETE!", font, BLACK, size = 30, box_surface=pygame.Surface((WIDTH//3, 40)), startx = x, starty=HEIGHT-150)
                         x += WIDTH//3
                     pygame.display.flip()
                     
