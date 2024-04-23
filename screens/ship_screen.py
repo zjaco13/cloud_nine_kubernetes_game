@@ -1,6 +1,6 @@
 import pygame
 import sys
-from util.util import FONT_SIZE_SMALL, HEIGHT, WIDTH, word_wrap_with_box, font, WHITE, RED, BLACK, BLUE, OCEAN_BLUE, BROWN
+from util.util import FONT_SIZE_MEDIUM, FONT_SIZE_SMALL, HEIGHT, WIDTH, word_wrap_with_box, font, WHITE, RED, BLACK, BLUE, OCEAN_BLUE, BROWN
 
 pygame.init()
 
@@ -56,7 +56,7 @@ class Player(pygame.sprite.Sprite):
 
 # Define NPC class
 class NPC(pygame.sprite.Sprite):
-    def __init__(self, x, y, text, image):
+    def __init__(self, x, y, text, image, name):
         super().__init__()
         self.image = pygame.Surface((60, 80))
         self.sprite = pygame.image.load(image)
@@ -64,6 +64,7 @@ class NPC(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.is_colliding = False
+        self.name = name
         self.col = 0 
         self.text = text
         self.last_keypress = 0
@@ -91,7 +92,8 @@ class NPC(pygame.sprite.Sprite):
                     self.col += 1
                     self.last_keypress = curr_keypress
             if self.col < len(self.text):
-                word_wrap_with_box(screen, self.text[self.col], font, BLACK, size=20)
+                word_wrap_with_box(screen, self.name, font, BLACK, box_surface=pygame.Surface((WIDTH, 50)),starty=HEIGHT-220, size=FONT_SIZE_MEDIUM)
+                word_wrap_with_box(screen, self.text[self.col], font, BLACK, box_surface=pygame.Surface((WIDTH, 220)), size=FONT_SIZE_SMALL)
             else:
                 player.frozen = False
                 self.is_colliding = False
@@ -134,7 +136,7 @@ class NPC2(pygame.sprite.Sprite):
                     self.col += 1
                     self.last_keypress = curr_keypress
             if self.col < len(self.text):
-                word_wrap_with_box(screen, self.text[self.col], font, BLACK, size=FONT_SIZE_SMALL)
+                word_wrap_with_box(screen, self.text[self.col], font, BLACK, box_surface= pygame.Surface((WIDTH, 220)), size=FONT_SIZE_SMALL)
             else:
                 player.frozen = False
                 self.is_colliding = False
@@ -203,8 +205,8 @@ def ship_screen(screen):
     all_sprites.add(player)
     players.add(player)
     
-    kube_npc = NPC(510, 260, kube_text, 'sprites/KuberNPC.png')
-    docker_npc = NPC(420, 660, docker_text, 'sprites/dockerSprite.png')
+    kube_npc = NPC(510, 260, kube_text, 'sprites/KuberNPC.png', "Kubernetes Mate")
+    docker_npc = NPC(420, 580, docker_text, 'sprites/dockerSprite.png', "Docker Mate")
     instructor_npc = NPC2(1100, 450, instructor_text, 'sprites/pirateNPC.png')
     start_npc = Helm_NPC(boat_x+200,(boat_y + boat_height//2) - 25, start_text)
       # Adjust position as needed
