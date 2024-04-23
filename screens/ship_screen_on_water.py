@@ -15,7 +15,8 @@ instructor_text = ["Talk to the two helper pirates about Kubernetes and Docker b
 all_sprites = pygame.sprite.Group()
 players = pygame.sprite.Group()
 npcs = pygame.sprite.Group()
-shipBackground = pygame.transform.scale(pygame.image.load('sprites/shipBackground.jpg'), (WIDTH, HEIGHT))
+oceanBackground = pygame.transform.scale(pygame.image.load('sprites/oceanBackground.jpg'), (WIDTH, HEIGHT))
+shipBackground = pygame.transform.scale(pygame.image.load('sprites/shipOceanBackground.png'), (WIDTH, HEIGHT))
 
 # Define player class
 class Player(pygame.sprite.Sprite):
@@ -180,7 +181,9 @@ def ship_screen(screen):
     
         #screen.fill(OCEAN_BLUE)
         #pygame.draw.rect(screen, BROWN, boat_rect)
+        screen.blit(oceanBackground, (0, 0))
         screen.blit(shipBackground, (0, 0))
+        
         # Update
         all_sprites.update(screen)
     
