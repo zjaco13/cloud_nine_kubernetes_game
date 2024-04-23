@@ -5,30 +5,30 @@ import sys
 from util.util import FONT_SIZE_BIG, FONT_SIZE_SMALL, word_wrap, word_wrap_with_box, WHITE, BLACK, font, OCEAN_BLUE, WIDTH, HEIGHT, RED
 pygame.init()
 
-deployment_sections = [("apiVersion: apps/v1\nkind: Deployment", "tells kubernetes which version of the api to use and what type of object is getting created/updated/deleted by this file"),
-                       ("metadata:\n\tname: ai-demo", "gives a name to the deployment"),
-                       ("spec:\n\treplicas: 2", "How many pods of this app should be in the cluster at all times, controlled by the ReplicaSet"),
-                       ("selector:\n\tmatchLabels:\n\t\tapp: ai-demo", "tells the ReplicaSet which pods it should manage based on the app selected"),
-                       ("template:\n\tmetadata:\n\t\tlabels:\n\t\t\tapp: ai-demo", "gives each pod a label so that it can be managed by the replicaset"),
-                       ("spec:\n\tcontainers:\n\t- name: ai-demo\n\t\timage: ai-demo\n\t\t\tports:\n\t\t\t- containerPort: 3000", "tells the pod which container to one, the name of it, the image it should use, and which ports it should expose")]
+deployment_sections = [("apiVersion: apps/v1\nkind: Deployment", "- Tells the kubernetes API which version use and which object is getting created/updated/deleted by this file, in this case a Deployment"),
+                       ("metadata:\n\tname: ai-demo", "- Gives a name to the deployment"),
+                       ("spec:\n\treplicas: 2", "- Specifies how many Pods of this app should be running on a Node at all times.\n- This is managed by a ReplicaSet object"),
+                       ("selector:\n\tmatchLabels:\n\t\tapp: ai-demo", "- Tells the ReplicaSet which Pods it should manage using the app label"),
+                       ("template:\n\tmetadata:\n\t\tlabels:\n\t\t\tapp: ai-demo", "- Gives each Pod a label so that it can be managed by the correct ReplicaSet"),
+                       ("spec:\n\tcontainers:\n\t- name: ai-demo\n\t\timage: ai-demo\n\t\t\tports:\n\t\t\t- containerPort: 3000", "- Tells the Pod which container image(the application) to run\n- Gives the container a name\n- Tells the container which ports it wants to be exposed on kubernetes")]
 
 deployment_text = ["apiVersion: apps/v1\nkind: Deployment", "metadata:\n\tname: ai-demo" ,"spec:\n\treplicas: 2", "selector:\n\t\tmatchLabels:\n\t\t\tapp: ai-demo", "template:\n\t\tmetadata:\n\t\t\tlabels:\n\t\t\t\tapp: ai-demo", "spec:\n\t\t\tcontainers:\n\t\t\t- name: ai-demo\n\t\t\t\timage: ai-demo\n\t\t\t\t\tports:\n\t\t\t\t\t- containerPort: 3000"]
 deployment_description = "This YAML file creates a Deployment in kubernetes.  A Deployment describes the desired state of an application on the cluster, including the number of Pods to run and which container to be on each Pod."
 
-dockerfile_sections = [("FROM python:3.11", "base image to pull from, normally use different language images as base"), 
-                       ("WORKDIR /app","set the working directory in the container"),
-                       ("COPY . /app", "copy app contents to the container working directory"),
-                       ("RUN pip install -r requirements.txt", "run instructions to build/install dependencies"),
-                       ("EXPOSE 3000", "Expose a port on a container if need to access externally"),
-                       ('CMD ["python", "server.py"]', "run the command specified for cmd")]
+dockerfile_sections = [("FROM python:3.11", "- Tells docker which already created image to start with\n- In this case a python image so we have everything needed to run a python app"), 
+                       ("WORKDIR /app","- Sets the working directory in the container to be the /app directory"),
+                       ("COPY . /app", "- Copies all files from the application on a local machine to the containers /app directory"),
+                       ("RUN pip install -r requirements.txt", "- Installs the dependencies of the application to the container from a file using the pip package manager"),
+                       ("EXPOSE 3000", "- Exposes port 3000 on the container to internet traffic so the application running on the container can send and recieve data"),
+                       ('CMD ["python", "server.py"]', "- Tells the container how to run the application")]
 dockerfile_text = [text for text, _ in dockerfile_sections]
 dockerfile_description = "This Dockerfile outlines the steps docker will take to package an application into a container.  Each step in the file creates a new container and caches it, so that during repeated builds these caches can be used."
 
-service_sections = [("apiVersion: v1\nkind: Service", "tells kubernetes which version of the api to use and which object will be created/updated/deleted by this file"),
-                    ("metadata:\n\tname: ai-demo", "gives a name to the service"),
-                    ("spec:\n\tselector:\n\t\tapp: ai-demo", "tells the service which pods are served traffic from this service"),
-                    ("ports:\n\t- protocol: TCP\n\t\tport: 80\n\t\ttargetPort: 3000", "The port that will be exposed to the internet by this service,The port on the container to pass the traffic to"),
-                    ("type: LoadBalancer", "The type of service (LoadBalancer - exposes to external load balancer handled by cloud provider - easiest option to setup, NodePort - exposed on a static port of the clusters ip address, ClusterIP - cluster internal only, ExternalName - maps service to some hostname and sets up DNS on the cluster for that name)")]
+service_sections = [("apiVersion: v1\nkind: Service", "- Tells the kubernetes API which version to use and which object is getting created/updated/deleted by this file, in this case a Service"),
+                    ("metadata:\n\tname: ai-demo", "- Gives a name to the Service"),
+                    ("spec:\n\tselector:\n\t\tapp: ai-demo", "- Tells the Service which group of Pods it should expose to the internet\n- In this case Pods with the app label ai-demo"),
+                    ("ports:\n\t- protocol: TCP\n\t\tport: 80\n\t\ttargetPort: 3000", "- Describes the port that will be exposed by the service object either on the Node or through a Load Balancer.\n- The target port is the port to forward traffic to in each of the Pods in the group"),
+                    ("type: LoadBalancer", "- Describes where the traffic will be handled\n- LoadBalancer - exposes to external load balancer handled by cloud provider\n- NodePort - exposed on a static port of the clusters ip address\n- ClusterIP - cluster internal access only\n- ExternalName - maps service to some hostname and sets up DNS on the cluster for that name")]
 service_text = ["apiVersion: v1\nkind: Service", "metadata:\n\tname: ai-demo", "spec:\n\tselector:\n\t\tapp: ai-demo", "ports:\n\t\t- protocol: TCP\n\t\t\tport: 80\n\t\t\ttargetPort: 3000", "type: LoadBalancer"]
 service_description = "This YAML files creates a Service in kubernetes.  A Service allows a group of Pods on the network, which allows an application to recieve and send internet traffic."
 
