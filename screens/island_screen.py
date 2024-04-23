@@ -2,7 +2,7 @@ from docker.api.build import random
 import difflib
 import pygame
 import sys
-from util.util import FONT_SIZE_BIG, FONT_SIZE_SMALL, word_wrap, word_wrap_with_box, WHITE, BLACK, font, OCEAN_BLUE, WIDTH, HEIGHT, RED
+from util.util import FONT_SIZE_BIG, FONT_SIZE_MEDIUM, FONT_SIZE_SMALL, word_wrap, word_wrap_with_box, WHITE, BLACK, font, OCEAN_BLUE, WIDTH, HEIGHT, RED
 pygame.init()
 
 deployment_sections = [("apiVersion: apps/v1\nkind: Deployment", "- Tells the kubernetes API which version use and which object is getting created/updated/deleted by this file, in this case a Deployment"),
@@ -10,10 +10,10 @@ deployment_sections = [("apiVersion: apps/v1\nkind: Deployment", "- Tells the ku
                        ("spec:\n\treplicas: 2", "- Specifies how many Pods of this app should be running on a Node at all times.\n- This is managed by a ReplicaSet object"),
                        ("selector:\n\tmatchLabels:\n\t\tapp: ai-demo", "- Tells the ReplicaSet which Pods it should manage using the app label"),
                        ("template:\n\tmetadata:\n\t\tlabels:\n\t\t\tapp: ai-demo", "- Gives each Pod a label so that it can be managed by the correct ReplicaSet"),
-                       ("spec:\n\tcontainers:\n\t- name: ai-demo\n\t\timage: ai-demo\n\t\t\tports:\n\t\t\t- containerPort: 3000", "- Tells the Pod which container image(the application) to run\n- Gives the container a name\n- Tells the container which ports it wants to be exposed on kubernetes")]
+                       ("spec:\n\tcontainers:\n\t- name: ai-demo\n\t\timage: ai-demo\n\t\tports:\n\t\t- containerPort: 3000", "- Tells the Pod which container image(the application) to run\n- Gives the container a name\n- Tells the container which ports it wants to be exposed on kubernetes")]
 
-deployment_text = ["apiVersion: apps/v1\nkind: Deployment", "metadata:\n\tname: ai-demo" ,"spec:\n\treplicas: 2", "selector:\n\t\tmatchLabels:\n\t\t\tapp: ai-demo", "template:\n\t\tmetadata:\n\t\t\tlabels:\n\t\t\t\tapp: ai-demo", "spec:\n\t\t\tcontainers:\n\t\t\t- name: ai-demo\n\t\t\t\timage: ai-demo\n\t\t\t\t\tports:\n\t\t\t\t\t- containerPort: 3000"]
-deployment_description = "This YAML file creates a Deployment in kubernetes.  A Deployment describes the desired state of an application on the cluster, including the number of Pods to run and which container to be on each Pod."
+deployment_text = ["apiVersion: apps/v1\nkind: Deployment", "metadata:\n\tname: ai-demo" ,"spec:\n\treplicas: 2", "\tselector:\n\t\tmatchLabels:\n\t\t\tapp: ai-demo", "\ttemplate:\n\t\tmetadata:\n\t\t\tlabels:\n\t\t\t\tapp: ai-demo", "\t\tspec:\n\t\t\tcontainers:\n\t\t\t- name: ai-demo\n\t\t\t\timage: ai-demo\n\t\t\t\tports:\n\t\t\t\t- containerPort: 3000"]
+deployment_description = "- This YAML file creates a Deployment in kubernetes\n- A Deployment describes the desired state of an application on the cluster\n- This includes the number of Pods to run, which container is to be on each Pod, and how to communicate with the containers."
 
 dockerfile_sections = [("FROM python:3.11", "- Tells docker which already created image to start with\n- In this case a python image so we have everything needed to run a python app"), 
                        ("WORKDIR /app","- Sets the working directory in the container to be the /app directory"),
@@ -22,15 +22,15 @@ dockerfile_sections = [("FROM python:3.11", "- Tells docker which already create
                        ("EXPOSE 3000", "- Exposes port 3000 on the container to internet traffic so the application running on the container can send and recieve data"),
                        ('CMD ["python", "server.py"]', "- Tells the container how to run the application")]
 dockerfile_text = [text for text, _ in dockerfile_sections]
-dockerfile_description = "This Dockerfile outlines the steps docker will take to package an application into a container.  Each step in the file creates a new container and caches it, so that during repeated builds these caches can be used."
+dockerfile_description = "- This Dockerfile outlines the steps docker will take to package an application into a container\n- Each step in the file creates a new container and caches it, so that during repeated builds these caches can be used"
 
 service_sections = [("apiVersion: v1\nkind: Service", "- Tells the kubernetes API which version to use and which object is getting created/updated/deleted by this file, in this case a Service"),
                     ("metadata:\n\tname: ai-demo", "- Gives a name to the Service"),
                     ("spec:\n\tselector:\n\t\tapp: ai-demo", "- Tells the Service which group of Pods it should expose to the internet\n- In this case Pods with the app label ai-demo"),
                     ("ports:\n\t- protocol: TCP\n\t\tport: 80\n\t\ttargetPort: 3000", "- Describes the port that will be exposed by the service object either on the Node or through a Load Balancer.\n- The target port is the port to forward traffic to in each of the Pods in the group"),
                     ("type: LoadBalancer", "- Describes where the traffic will be handled\n- LoadBalancer - exposes to external load balancer handled by cloud provider\n- NodePort - exposed on a static port of the clusters ip address\n- ClusterIP - cluster internal access only\n- ExternalName - maps service to some hostname and sets up DNS on the cluster for that name")]
-service_text = ["apiVersion: v1\nkind: Service", "metadata:\n\tname: ai-demo", "spec:\n\tselector:\n\t\tapp: ai-demo", "ports:\n\t\t- protocol: TCP\n\t\t\tport: 80\n\t\t\ttargetPort: 3000", "type: LoadBalancer"]
-service_description = "This YAML files creates a Service in kubernetes.  A Service allows a group of Pods on the network, which allows an application to recieve and send internet traffic."
+service_text = ["apiVersion: v1\nkind: Service", "metadata:\n\tname: ai-demo", "spec:\n\tselector:\n\t\tapp: ai-demo", "\tports:\n\t\t- protocol: TCP\n\t\t\tport: 80\n\t\t\ttargetPort: 3000", "\ttype: LoadBalancer"]
+service_description = "- This YAML files creates a Service in kubernetes\n- A Service exposes a group of Pods on the network, allowing an application to recieve and send internet traffic."
 
 islandSprites =['sprites/island1.png', 'sprites/island2.png', 'sprites/island3.png', 'sprites/island4.png', 'sprites/island5.png', 'sprites/island6.png', 'sprites/island7.png', 'sprites/island8.png',
                 'sprites/island9.png', 'sprites/island10.png', 'sprites/island11.png', 'sprites/island12.png', 'sprites/island13.png', 'sprites/island14.png', 'sprites/island15.png', 'sprites/island16.png',
@@ -243,11 +243,11 @@ def island_screen(screen):
                         show_file = False 
                 x = 0
                 for file in player.files:
-                    word_wrap_with_box(screen, file.name, font, BLACK, size = 40, box_surface= pygame.Surface((WIDTH // 3, 60)), startx = x, starty = 60)
-                    word_wrap_with_box(screen, file.get_text(), font, BLACK, size = 20, box_surface = pygame.Surface((WIDTH//3, HEIGHT-210)), startx = x, starty = HEIGHT-150)
-                    word_wrap_with_box(screen, "Description:\n" + file.description, font, BLACK, size = 20, box_surface=pygame.Surface((WIDTH//3, 150)), startx = x)
+                    word_wrap_with_box(screen, file.name, font, BLACK, size = FONT_SIZE_MEDIUM, box_surface= pygame.Surface((WIDTH // 3, 60)), startx = x, starty = 60)
+                    word_wrap_with_box(screen, file.get_text(), font, BLACK, size = FONT_SIZE_SMALL - 7, box_surface = pygame.Surface((WIDTH//3, HEIGHT-360)), startx = x, starty = HEIGHT-300)
+                    word_wrap_with_box(screen, "Description:\n" + file.description, font, BLACK, size = FONT_SIZE_SMALL-5, box_surface=pygame.Surface((WIDTH//3, 300)), startx = x)
                     if file.done():
-                        word_wrap_with_box(screen, "FILE COMPLETE!", font, BLACK, size = 30, box_surface=pygame.Surface((WIDTH//3, 40)), startx = x, starty=HEIGHT-150)
+                        word_wrap_with_box(screen, "FILE COMPLETE!", font, BLACK, size = FONT_SIZE_SMALL, box_surface=pygame.Surface((WIDTH//3, 40)), startx = x, starty=HEIGHT-300)
                     x += WIDTH//3
                 pygame.display.flip()
             game_over(screen)
@@ -272,11 +272,11 @@ def island_screen(screen):
                             show_file = False 
                     x = 0
                     for file in player.files:
-                        word_wrap_with_box(screen, file.name, font, BLACK, size = 40, box_surface= pygame.Surface((WIDTH // 3, 60)), startx = x, starty = 60)
-                        word_wrap_with_box(screen, file.get_text(), font, BLACK, size = 20, box_surface = pygame.Surface((WIDTH//3, HEIGHT-210)), startx = x, starty = HEIGHT-150)
-                        word_wrap_with_box(screen, "Description:\n" + file.description, font, BLACK, size = 20, box_surface=pygame.Surface((WIDTH//3, 150)), startx = x)
+                        word_wrap_with_box(screen, file.name, font, BLACK, size = FONT_SIZE_MEDIUM, box_surface= pygame.Surface((WIDTH // 3, 60)), startx = x, starty = 60)
+                        word_wrap_with_box(screen, file.get_text(), font, BLACK, size = FONT_SIZE_SMALL - 7, box_surface = pygame.Surface((WIDTH//3, HEIGHT-360)), startx = x, starty = HEIGHT-300)
+                        word_wrap_with_box(screen, "Description:\n" + file.description, font, BLACK, size = FONT_SIZE_SMALL - 5, box_surface=pygame.Surface((WIDTH//3, 300)), startx = x)
                         if file.done():
-                            word_wrap_with_box(screen, "FILE COMPLETE!", font, BLACK, size = 30, box_surface=pygame.Surface((WIDTH//3, 40)), startx = x, starty=HEIGHT-150)
+                            word_wrap_with_box(screen, "FILE COMPLETE!", font, BLACK, size = FONT_SIZE_SMALL, box_surface=pygame.Surface((WIDTH//3, 40)), startx = x, starty=HEIGHT-300)
                         x += WIDTH//3
                     pygame.display.flip()
                     
