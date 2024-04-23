@@ -18,7 +18,7 @@ deployment_description = ""
 dockerfile_sections = [("FROM python:3.11", "base image to pull from, normally use different language images as base"), 
                        ("WORKDIR /app","set the working directory in the container"),
                        ("COPY . /app", "copy app contents to the container working directory"),
-                       ("RUN pip install --no-cache-dir -r requirements.txt", "run instructions to build/install dependencies"),
+                       ("RUN pip install -r requirements.txt", "run instructions to build/install dependencies"),
                        ("EXPOSE 3000", "Expose a port on a container if need to access externally"),
                        ('CMD ["python", "server.py"]', "run the command specified for cmd")]
 dockerfile_text = [text for text, _ in dockerfile_sections]
