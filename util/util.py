@@ -4,7 +4,10 @@ import pygame.freetype
 pygame.init()
 
 
-font = pygame.freetype.Font('Minecraft.ttf', 30)
+font = pygame.freetype.Font('arcade.ttf', 40)
+FONT_SIZE_SMALL = 30
+FONT_SIZE_MEDIUM = 40
+FONT_SIZE_BIG = 60
 WIDTH = 1280
 HEIGHT = 900
 
@@ -49,10 +52,10 @@ def word_wrap_with_box(surf, text, font, color=(0, 0, 0), box_surface = pygame.S
     box_rect.bottomleft = (startx, starty)
 
     # Render text onto the box surface
-    x, y = 10, 0
+    x, y = 0, 0
     for word in words:
         if word == "\n":
-            x = 10
+            x = 0 
             y += line_spacing
         elif word == "\t":
             x += space.width * 2

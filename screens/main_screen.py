@@ -1,7 +1,7 @@
 import pygame
 import sys
 import pygame.freetype
-from util.util import HEIGHT, WIDTH, word_wrap, WHITE, GRAY, BLACK, RED, font
+from util.util import FONT_SIZE_MEDIUM, HEIGHT, WIDTH, word_wrap, WHITE, GRAY, BLACK, RED, font, word_wrap_with_box
 
 # Define game states
 MAIN_MENU = 0
@@ -78,7 +78,7 @@ def render_main_menu(screen):
     # Render title of the game on the screen
     #font.render_to(screen, (screen_width // 2 - 200, screen_height // 2 - 50), "Kubernetes Pirate Adventure", RED)
 
-    title_button = pygame.Rect(screen_width // 2 - 200, screen_height // 2 - 50, 450, 50)
+    title_button = pygame.Rect(screen_width // 2 - 300, screen_height // 2 - 50, 600, 50)
     pygame.draw.rect(screen, GRAY, title_button)
     title_text,_ = font.render("Kubernetes Pirate Adventure", BLACK)
     title_text_rect = title_text.get_rect(center=title_button.center)
@@ -135,36 +135,7 @@ def render_description(screen):
     screen_width, screen_height = screen.get_size()
 
     #word_wrap(screen, "The purpose of this game is to teach you about open source tools that are critical to know for today's cloud focused environment.  The 2 tools focused on in this game are Docker and Kubernetes.  With a grasp of these tools, you will be primed for success when developing and deploying your application to the world", font, WHITE)
-
-    text, _ = font.render("The purpose of this game is to teach you about open source tools", BLACK)
-    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
-    text_box_rect = text_rect.inflate(10, 10)
-    pygame.draw.rect(screen, WHITE, text_box_rect)
-    screen.blit(text, text_rect)
-
-    text2, _ = font.render("that are critical to know for today's cloud focused environment.", BLACK)
-    text2_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 40))
-    text2_box_rect = text2_rect.inflate(10, 10)
-    pygame.draw.rect(screen, WHITE, text2_box_rect)
-    screen.blit(text2, text2_rect)
-
-    text3, _ = font.render("The 2 tools focused on in this game are Docker and Kubernetes.", BLACK)
-    text3_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 80))
-    text3_box_rect = text3_rect.inflate(10, 10)
-    pygame.draw.rect(screen, WHITE, text3_box_rect)
-    screen.blit(text3, text3_rect)
-
-    text4, _ = font.render("With a grasp of these tools, you will be primed for success when", BLACK)
-    text4_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 120))
-    text4_box_rect = text4_rect.inflate(10, 10)
-    pygame.draw.rect(screen, WHITE, text4_box_rect)
-    screen.blit(text4, text4_rect)
-
-    text5, _ = font.render("developing and deploying your application to the world.", BLACK)
-    text5_rect = text.get_rect(center=(screen_width // 2, (screen_height // 2) + 160))
-    text5_box_rect = text5_rect.inflate(10, 10)
-    pygame.draw.rect(screen, WHITE, text5_box_rect)
-    screen.blit(text5, text5_rect)
+    word_wrap_with_box(screen, "The purpose of this game is to teach you about open source tools that are critical to know for today's cloud focused environment.  The 2 tools focused on in this game are Docker and Kubernetes.  With a grasp of these tools, you will be primed for success when developing and deploying your application to the world", font, BLACK, box_surface = pygame.Surface((WIDTH, 300)), starty = HEIGHT // 2 + 250, box_color= WHITE, size=FONT_SIZE_MEDIUM)
 
     # Render back button
     back_button = pygame.Rect(20, 20, 100, 50)
@@ -204,11 +175,7 @@ def render_tutorial(screen):
     screen_width, screen_height = screen.get_size()
 
     # Render content for the new screen 4
-    text, _ = font.render("Use wasd to move the player's sprite. Use Enter to interact with characters", BLACK)
-    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
-    text_box_rect = text_rect.inflate(10, 10)
-    pygame.draw.rect(screen, WHITE, text_box_rect)
-    screen.blit(text, text_rect)
+    word_wrap_with_box(screen, "Use wasd to move the player's sprite. Use Enter to interact with characters.  When traveling to islands, use F to open your file inventory, and Enter to close it.", font, BLACK, box_surface=pygame.Surface((WIDTH, 200)), box_color=WHITE, starty=HEIGHT //2 -100, size=FONT_SIZE_MEDIUM)
 
     # Render back button
     back_button = pygame.Rect(20, 20, 100, 50)
