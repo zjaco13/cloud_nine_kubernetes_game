@@ -20,7 +20,7 @@ background2_image = pygame.transform.scale(pygame.image.load('sprites/background
 
 def main_screen(screen):
     global current_state
-    
+
     while True:
 
         # Handle events
