@@ -10,9 +10,9 @@ deployment_sections = [("apiVersion: apps/v1\nkind: Deployment", "- Tells the ku
                        ("spec:\n\treplicas: 2", "- Specifies how many Pods of this app should be running on a Node at all times.\n- This is managed by a ReplicaSet object"),
                        ("selector:\n\tmatchLabels:\n\t\tapp: ai-demo", "- Tells the ReplicaSet which Pods it should manage using the app label"),
                        ("template:\n\tmetadata:\n\t\tlabels:\n\t\t\tapp: ai-demo", "- Gives each Pod a label so that it can be managed by the correct ReplicaSet"),
-                       ("spec:\n\tcontainers:\n\t- name: ai-demo\n\t\timage: ai-demo\n\t\tports:\n\t\t- containerPort: 3000", "- Tells the Pod which container image(the application) to run\n- Gives the container a name\n- Tells the container which ports it wants to be exposed on kubernetes")]
+                       ("spec:\n\tcontainers:\n\t- name: ai-demo\n\t\timage: ai-demo:latest\n\t\tports:\n\t\t- containerPort: 3000", "- Tells the Pod which container image(the application) to run\n- Gives the container a name\n- Tells the container which ports it wants to be exposed on kubernetes")]
 
-deployment_text = ["apiVersion: apps/v1\nkind: Deployment", "metadata:\n\tname: ai-demo" ,"spec:\n\treplicas: 2", "\tselector:\n\t\tmatchLabels:\n\t\t\tapp: ai-demo", "\ttemplate:\n\t\tmetadata:\n\t\t\tlabels:\n\t\t\t\tapp: ai-demo", "\t\tspec:\n\t\t\tcontainers:\n\t\t\t- name: ai-demo\n\t\t\t\timage: ai-demo\n\t\t\t\tports:\n\t\t\t\t- containerPort: 3000"]
+deployment_text = ["apiVersion: apps/v1\nkind: Deployment", "metadata:\n\tname: ai-demo" ,"spec:\n\treplicas: 2", "\tselector:\n\t\tmatchLabels:\n\t\t\tapp: ai-demo", "\ttemplate:\n\t\tmetadata:\n\t\t\tlabels:\n\t\t\t\tapp: ai-demo", "\t\tspec:\n\t\t\tcontainers:\n\t\t\t- name: ai-demo\n\t\t\t\timage: ai-demo:latest\n\t\t\t\tports:\n\t\t\t\t- containerPort: 3000"]
 deployment_description = "- This YAML file creates a Deployment in kubernetes\n- A Deployment describes the desired state of an application on the cluster\n- This includes the number of Pods to run, which container is to be on each Pod, and how to communicate with the containers."
 
 dockerfile_sections = [("FROM python:3.11", "- Tells docker which already created image to start with\n- In this case a python image so we have everything needed to run a python app"), 

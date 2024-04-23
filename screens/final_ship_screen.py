@@ -6,10 +6,14 @@ pygame.init()
 
 boat_width = 1100
 boat_height = 650 
-kube_text = ["ls"]
-docker_text = ["ls"]
-start_text = ["ls"]
-instructor_text = ["ls"]
+kube_text = ["I will teach you how you can deploy your completed Deployment and Service onto a Kubernetes Cluster", 
+             "To deploy the Deployment, you will run: kubectl apply -f deployment.yaml\nTo deploy the Service, you will run: kubectl apply -f service.yaml",
+             "These commands search in the current directory for the files deployment.yaml and service.yaml, and applies the objects defined in them to the kubernetes cluster."]
+docker_text = ["I will teach you how to build your application into a container using the Dockerfile we just created.",
+               "To build the image, you will run: docker build -t ai-demo:latest .",
+               "This command searches the current directory for a Dockerfile, then runs the steps in that file to create the container image.\nThis command then tags that image as ai-demo:latest and pushes it to the local docker registry of images"]
+start_text = ["Would you like to go defeat the enemies with your Kubernetes and Docker knowledge?(Y/N)"]
+instructor_text = ["Talk to each of the Kubernetes and Docker Mates to learn about how you can do combat by deploying your application onto the cluster!"]
 all_sprites = pygame.sprite.Group()
 players = pygame.sprite.Group()
 npcs = pygame.sprite.Group()
