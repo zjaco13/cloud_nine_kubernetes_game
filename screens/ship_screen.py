@@ -163,7 +163,7 @@ def ship_screen(screen):
     players.add(player)
     
     kube_npc = NPC(510, 260, kube_text, 'sprites/kubernetesPirate.png', "Kubernetes Mate")
-    docker_npc = NPC(420, 650, docker_text, 'sprites/dockerPirate.png', "Docker Mate")
+    docker_npc = NPC(420, 570, docker_text, 'sprites/dockerPirate.png', "Docker Mate")
     instructor_npc = NPC(1100, 450, instructor_text, 'sprites/pirateNPC.png', "Instructor Mate")
     start_npc = Helm_NPC(boat_x+200,(boat_y + boat_height//2) - 25, start_text)
       # Adjust position as needed

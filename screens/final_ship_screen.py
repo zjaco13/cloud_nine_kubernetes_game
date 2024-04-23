@@ -17,7 +17,8 @@ instructor_text = ["Talk to each of the Kubernetes and Docker Mates to learn abo
 all_sprites = pygame.sprite.Group()
 players = pygame.sprite.Group()
 npcs = pygame.sprite.Group()
-shipBackground = pygame.transform.scale(pygame.image.load('sprites/shipBackground.jpg'), (WIDTH, HEIGHT))
+oceanBackground = pygame.transform.scale(pygame.image.load('sprites/oceanBackground.jpg'), (WIDTH, HEIGHT))
+shipBackground = pygame.transform.scale(pygame.image.load('sprites/shipOceanBackground.png'), (WIDTH, HEIGHT))
 
 # Define player class
 class Player(pygame.sprite.Sprite):
@@ -58,11 +59,11 @@ class Player(pygame.sprite.Sprite):
 
 # Define NPC class
 class NPC(pygame.sprite.Sprite):
-    def __init__(self, x, y, text, image, name, size = (60,80)):
+    def __init__(self, x, y, text, image, name):
         super().__init__()
-        self.image = pygame.Surface(size)
+        self.image = pygame.Surface((90, 120))
         self.sprite = pygame.image.load(image)
-        self.sprite = pygame.transform.scale(self.sprite, size)
+        self.sprite = pygame.transform.scale(self.sprite, (90, 120))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.is_colliding = False
@@ -164,9 +165,9 @@ def final_ship_screen(screen):
     all_sprites.add(player)
     players.add(player)
     
-    kube_npc = NPC(510, 260, kube_text, 'sprites/KuberNPC.png', "Kubernetes Mate")
-    docker_npc = NPC(420, 580, docker_text, 'sprites/dockerSprite.png', "Docker Mate")
-    instructor_npc = NPC(1100, 450, instructor_text, 'sprites/pirateNPC.png', "Instructor Mate", (90, 126))
+    kube_npc = NPC(510, 260, kube_text, 'sprites/kubernetesPirate.png', "Kubernetes Mate")
+    docker_npc = NPC(420, 570, docker_text, 'sprites/dockerPirate.png', "Docker Mate")
+    instructor_npc = NPC(1100, 450, instructor_text, 'sprites/pirateNPC.png', "Instructor Mate")
     start_npc = Helm_NPC(boat_x+200,(boat_y + boat_height//2) - 25, start_text)
       # Adjust position as needed
     all_sprites.add(kube_npc, docker_npc, start_npc, instructor_npc)
@@ -182,6 +183,7 @@ def final_ship_screen(screen):
     
         #screen.fill(OCEAN_BLUE)
         #pygame.draw.rect(screen, BROWN, boat_rect)
+        screen.blit(oceanBackground, (0, 0))
         screen.blit(shipBackground, (0, 0))
         # Update
         all_sprites.update(screen)
