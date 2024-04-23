@@ -2,7 +2,7 @@ from docker.api.build import random
 import difflib
 import pygame
 import sys
-from util.util import word_wrap, word_wrap_with_box, WHITE, BLACK, font, OCEAN_BLUE, WIDTH, HEIGHT, RED
+from util.util import FONT_SIZE_BIG, FONT_SIZE_SMALL, word_wrap, word_wrap_with_box, WHITE, BLACK, font, OCEAN_BLUE, WIDTH, HEIGHT, RED
 pygame.init()
 
 deployment_sections = [("apiVersion: apps/v1\nkind: Deployment", "tells kubernetes which version of the api to use and what type of object is getting created/updated/deleted by this file"),
@@ -116,14 +116,14 @@ class Island(pygame.sprite.Sprite):
                 player = p
         if self.is_colliding:
             while True:
-                word_wrap_with_box(screen, "\n" +self.text, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 310)),starty = HEIGHT-250, size=20)
-                word_wrap_with_box(screen, "Copy this text to your file:\n" + self.input, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 310)), startx = WIDTH//2, starty = HEIGHT - 250, size=20)
-                word_wrap_with_box(screen, "What this code does:\n" + self.description, font, BLACK, box_surface=pygame.Surface((WIDTH, 250)),size=20)
-                word_wrap_with_box(screen, self.filename, font, BLACK, size = 40, box_surface = pygame.Surface((WIDTH, 60)), starty=60)
+                word_wrap_with_box(screen, "\n" +self.text, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 310)),starty = HEIGHT-250, size=FONT_SIZE_SMALL)
+                word_wrap_with_box(screen, "Copy this text to your file:\n" + self.input, font, BLACK, box_surface=pygame.Surface((WIDTH // 2, HEIGHT - 310)), startx = WIDTH//2, starty = HEIGHT - 250, size=FONT_SIZE_SMALL)
+                word_wrap_with_box(screen, "What this code does:\n" + self.description, font, BLACK, box_surface=pygame.Surface((WIDTH, 250)),size=FONT_SIZE_SMALL)
+                word_wrap_with_box(screen, self.filename, font, BLACK, size = FONT_SIZE_BIG, box_surface = pygame.Surface((WIDTH, 60)), starty=60)
                 if not self.input == self.text:
-                    output_list = [li.replace("-", "", 1) for li in difflib.ndiff(self.text, self.input) if li[0] != ' ']
-                    print_list = "".join(map(str,output_list)).replace("\t", "TAB")
-                    word_wrap_with_box(screen, "INCORRECT TEXT!\n" + print_list,  font, RED, size=20, box_surface=pygame.Surface((WIDTH //2, 250)), startx=WIDTH//2, starty=HEIGHT-250)
+                    output_list = [li.replace("- ", "", 1) for li in difflib.ndiff(self.text, self.input) if li[0] != ' ']
+                    print_list = "".join(str(x) for x in output_list).replace("\t", "TAB")
+                    word_wrap_with_box(screen, "INCORRECT TEXT!\n" + print_list,  font, RED, size=FONT_SIZE_SMALL, box_surface=pygame.Surface((WIDTH //2, 250)), startx=WIDTH//2, starty=HEIGHT-250)
                 pygame.display.flip()
                 if self.input == self.text:
                     break
@@ -231,6 +231,25 @@ def island_screen(screen):
     while running:
         # Handle events
         if all(file.done() for file in player.files):
+            show_file = True
+            while show_file:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+                        show_file = False 
+                        pygame.quit()
+                        sys.exit()
+                    elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                        show_file = False 
+                x = 0
+                for file in player.files:
+                    word_wrap_with_box(screen, file.name, font, BLACK, size = 40, box_surface= pygame.Surface((WIDTH // 3, 60)), startx = x, starty = 60)
+                    word_wrap_with_box(screen, file.get_text(), font, BLACK, size = 20, box_surface = pygame.Surface((WIDTH//3, HEIGHT-210)), startx = x, starty = HEIGHT-150)
+                    word_wrap_with_box(screen, "Description:\n" + file.description, font, BLACK, size = 20, box_surface=pygame.Surface((WIDTH//3, 150)), startx = x)
+                    if file.done():
+                        word_wrap_with_box(screen, "FILE COMPLETE!", font, BLACK, size = 30, box_surface=pygame.Surface((WIDTH//3, 40)), startx = x, starty=HEIGHT-150)
+                    x += WIDTH//3
+                pygame.display.flip()
             game_over(screen)
             # goto win screen or screen 4
             

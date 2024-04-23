@@ -1,6 +1,6 @@
 import pygame
 import sys
-from util.util import HEIGHT, WIDTH, word_wrap_with_box, font, WHITE, RED, BLACK, BLUE, OCEAN_BLUE, BROWN
+from util.util import FONT_SIZE_SMALL, HEIGHT, WIDTH, word_wrap_with_box, font, WHITE, RED, BLACK, BLUE, OCEAN_BLUE, BROWN
 
 pygame.init()
 
@@ -134,7 +134,7 @@ class NPC2(pygame.sprite.Sprite):
                     self.col += 1
                     self.last_keypress = curr_keypress
             if self.col < len(self.text):
-                word_wrap_with_box(screen, self.text[self.col], font, BLACK, size=20)
+                word_wrap_with_box(screen, self.text[self.col], font, BLACK, size=FONT_SIZE_SMALL)
             else:
                 player.frozen = False
                 self.is_colliding = False
