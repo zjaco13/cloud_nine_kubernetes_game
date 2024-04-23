@@ -2,7 +2,6 @@ import pygame
 import sys
 import pygame.freetype
 from util.util import HEIGHT, WIDTH, word_wrap, WHITE, GRAY, BLACK, RED, font
-from screens.main_screen import main_screen
 
 # Load the image
 background_image = pygame.transform.scale(pygame.image.load('sprites/background.jpg'), (WIDTH, HEIGHT))
@@ -41,4 +40,5 @@ def game_over_screen(screen):
                     return_main(screen)
 
 def return_main(screen):
+    from screens.main_screen import main_screen
     main_screen(screen)

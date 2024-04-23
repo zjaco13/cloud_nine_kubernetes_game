@@ -2,7 +2,6 @@ import pygame
 import sys
 import pygame.freetype
 from util.util import HEIGHT, WIDTH, word_wrap, WHITE, GRAY, BLACK, RED, font
-from screens.ship_screen import ship_screen
 
 # Define game states
 MAIN_MENU = 0
@@ -40,10 +39,6 @@ def main_screen(screen):
                         current_state = TEAM
                     elif tut_button_rect.collidepoint(event.pos):
                         current_state = TUTORIAL
-                elif current_state == PLAY:
-                    # Handle events specific to the PLAY screen
-                    if back_button_rect.collidepoint(event.pos):
-                        current_state = MAIN_MENU
                 elif current_state == DESCRIPTION:
                     # Handle events specific to the DESCRIPTION screen
                     if back_button_rect.collidepoint(event.pos):
@@ -63,6 +58,7 @@ def main_screen(screen):
             render_main_menu(screen)
         elif current_state == PLAY:
             play_game(screen)
+            current_state = MAIN_MENU
         elif current_state == DESCRIPTION:
             render_description(screen)
         elif current_state == TEAM:
@@ -128,6 +124,7 @@ def render_main_menu(screen):
     tut_button_rect = tut_button
 
 def play_game(screen):
+    from screens.ship_screen import ship_screen
     ship_screen(screen)
 
 

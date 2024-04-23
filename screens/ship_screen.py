@@ -1,7 +1,6 @@
 import pygame
 import sys
 from util.util import HEIGHT, WIDTH, word_wrap_with_box, font, WHITE, RED, BLACK, BLUE, OCEAN_BLUE, BROWN
-from screens.island_screen import island_screen
 
 pygame.init()
 
@@ -145,6 +144,11 @@ class Helm_NPC(pygame.sprite.Sprite):
                 self.is_colliding = False
                 player.is_colliding = False
 
+
+def to_island_screen(screen):
+    from screens.island_screen import island_screen
+    island_screen(screen)
+
 def ship_screen(screen):
     boat_x = (WIDTH - boat_width) // 2
     boat_y = (HEIGHT - boat_height) // 2
@@ -166,7 +170,8 @@ def ship_screen(screen):
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
+                sys.exit()
     
         screen.fill(OCEAN_BLUE)
         pygame.draw.rect(screen, BROWN, boat_rect)
@@ -174,7 +179,7 @@ def ship_screen(screen):
         all_sprites.update(screen)
     
         if start_npc.spoken_y:
-            island_screen(screen)
+            to_island_screen(screen)
         if kube_npc.spoken and docker_npc.spoken:
             start_npc.can_speak = True
 
@@ -191,5 +196,3 @@ def ship_screen(screen):
     
         # Cap the frame rate
         pygame.time.Clock().tick(60)
-    pygame.quit()
-    sys.exit()

@@ -2,7 +2,6 @@ from docker.api.build import random
 import difflib
 import pygame
 import sys
-from screens.game_over import game_over_screen
 from util.util import word_wrap, word_wrap_with_box, WHITE, BLACK, font, OCEAN_BLUE, WIDTH, HEIGHT, RED
 pygame.init()
 
@@ -188,6 +187,9 @@ def generate_island_positions(num_islands, min_distance):
                     break
         island_positions.append((x, y))
     return island_positions
+def game_over(screen):
+    from screens.game_over import game_over_screen
+    game_over_screen(screen)
 
 def island_screen(screen):
     # Create player and NPC objects
@@ -225,12 +227,15 @@ def island_screen(screen):
     while running:
         # Handle events
         if all(file.done() for file in player.files):
-            game_over_screen(screen)
+            game_over(screen)
             # goto win screen or screen 4
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+    # Quit Pygame
+                pygame.quit()
+                sys.exit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_f:
                 show_file = True
                 while show_file:
@@ -238,6 +243,8 @@ def island_screen(screen):
                         if event.type == pygame.QUIT:
                             running = False
                             show_file = False 
+                            pygame.quit()
+                            sys.exit()
                         elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                             show_file = False 
                     x = 0
@@ -268,6 +275,3 @@ def island_screen(screen):
         # Cap the frame rate
         pygame.time.Clock().tick(60)
     
-    # Quit Pygame
-    pygame.quit()
-    sys.exit()
