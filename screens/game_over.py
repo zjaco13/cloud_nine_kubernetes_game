@@ -20,7 +20,7 @@ def game_over_screen(screen):
     # Render a "Play Again" button
     play_again_button = pygame.Rect(screen_width // 2, (screen_height // 2) + 160, 200, 50)
     pygame.draw.rect(screen, GRAY, play_again_button)
-    play_again_text, _ = font.render("Play Again", BLACK)
+    play_again_text, _ = font.render("QUIT", BLACK)
     play_again_text_rect = play_again_text.get_rect(center=play_again_button.center)
     screen.blit(play_again_text, play_again_text_rect)
     global play_again_button_rect
@@ -37,7 +37,8 @@ def game_over_screen(screen):
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if play_again_button.collidepoint(event.pos):
-                    return_main(screen)
+                    pygame.quit()
+                    sys.exit()
 
 def return_main(screen):
     from screens.main_screen import main_screen
