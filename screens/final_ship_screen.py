@@ -6,12 +6,10 @@ pygame.init()
 
 boat_width = 1100
 boat_height = 650 
-kube_text = ["Kubernetes is a portable, extensible, open source platform for managing containerized workloads and services, that facilitates both declarative configuration and automation. It has a large, rapidly growing ecosystem. Kubernetes services, support, and tools are widely available.", "Kubernetes provides you with a framework to run distributed systems resiliently. It takes care of scaling and failover for your application, provides deployment patterns, and more.", "Kubernetes runs your workload by placing containers into Pods to run on Nodes. A node may be a virtual or physical machine, depending on the cluster. Each node is managed by the control plane and contains the services necessary to run Pods."]
-docker_text = [
-"Docker is an open platform for developing, shipping, and running applications. Docker enables you to separate your applications from your infrastructure so you can deliver software quickly. With Docker, you can manage your infrastructure in the same ways you manage your applications. By taking advantage of Docker's methodologies for shipping, testing, and deploying code, you can significantly reduce the delay between writing code and running it in production.", 
-"Docker provides the ability to package and run an application in a loosely isolated environment called a container. The isolation and security lets you run many containers simultaneously on a given host. Containers are lightweight and contain everything needed to run the application, so you don't need to rely on what's installed on the host. You can share containers while you work, and be sure that everyone you share with gets the same container that works in the same way.", "Docker's container-based platform allows for highly portable workloads. Docker containers can run on a developer's local laptop, on physical or virtual machines in a data center, on cloud providers, or in a mixture of environments. Docker's portability and lightweight nature also make it easy to dynamically manage workloads, scaling up or tearing down applications and services as business needs dictate, in near real time."]
-start_text = ["Set Sail? (Y/N)"]
-instructor_text = ["Talk to the two helper pirates about Kubernetes and Docker before asking the pirate at the wheel to set sail thorugh the ocean."]
+kube_text = []
+docker_text = []
+start_text = []
+instructor_text = []
 all_sprites = pygame.sprite.Group()
 players = pygame.sprite.Group()
 npcs = pygame.sprite.Group()
@@ -149,11 +147,11 @@ class Helm_NPC(pygame.sprite.Sprite):
                 player.is_colliding = False
 
 
-def to_island_screen(screen):
-    from screens.island_screen import island_screen
-    island_screen(screen)
+def to_end_screen(screen):
+    from screens.game_over import game_over_screen 
+    game_over_screen(screen)
 
-def ship_screen(screen):
+def final_ship_screen(screen):
     boat_x = (WIDTH - boat_width) // 2
     boat_y = (HEIGHT - boat_height) // 2
     boat_rect = pygame.Rect(boat_x, boat_y, boat_width, boat_height)
@@ -185,7 +183,7 @@ def ship_screen(screen):
         all_sprites.update(screen)
     
         if start_npc.spoken_y:
-            to_island_screen(screen)
+            to_end_screen(screen)
         if kube_npc.spoken and docker_npc.spoken:
             start_npc.can_speak = True
 

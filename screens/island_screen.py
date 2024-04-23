@@ -191,9 +191,9 @@ def generate_island_positions(num_islands, min_distance):
                     break
         island_positions.append((x, y))
     return island_positions
-def game_over(screen):
-    from screens.game_over import game_over_screen
-    game_over_screen(screen)
+def to_final_ship(screen):
+    from screens.final_ship_screen import to_end_screen 
+    to_end_screen(screen)
 
 def island_screen(screen):
     # Create player and NPC objects
@@ -250,7 +250,7 @@ def island_screen(screen):
                         word_wrap_with_box(screen, "FILE COMPLETE!", font, BLACK, size = FONT_SIZE_SMALL, box_surface=pygame.Surface((WIDTH//3, 40)), startx = x, starty=HEIGHT-300)
                     x += WIDTH//3
                 pygame.display.flip()
-            game_over(screen)
+            to_final_ship(screen)
             # goto win screen or screen 4
             
         for event in pygame.event.get():
