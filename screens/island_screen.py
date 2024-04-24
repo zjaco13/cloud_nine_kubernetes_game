@@ -104,6 +104,9 @@ class Island(pygame.sprite.Sprite):
             screen = args[0]
         else:
             raise ValueError("Missing Screen argument")
+        if self.spoken:
+            self.kill()
+
         collisions = pygame.sprite.spritecollide(self, players, False)
         player = None
         for p in collisions:

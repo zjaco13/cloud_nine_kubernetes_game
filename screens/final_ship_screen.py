@@ -38,7 +38,7 @@ class Player(pygame.sprite.Sprite):
         key = pygame.key.get_pressed()
         self.dx = 0
         self.dy = 0 
-        dist = 2 # distance moved in 1 frame, try changing it to 5
+        dist = 5 # distance moved in 1 frame, try changing it to 5
         if key[pygame.K_s]: # down key
             self.dy += dist
         elif key[pygame.K_w]: # up key
