@@ -3,6 +3,8 @@
 ## Requirements
 You will need git, python, and pip installed on your system.
 
+## Running from a zip file
+
 
 ## Running from git
 #### First clone the repository
